@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <style>
+        body {
+            font-family: 'Google Sans', sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        .button-group {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .primary-button {
+            background-color: #4285f4;
+            color: white;
+        }
+        .primary-button:hover {
+            background-color: #3367d6;
+        }
+        .secondary-button {
+            background-color: #f8f9fa;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+        }
+        .secondary-button:hover {
+            background-color: #f1f3f4;
+        }
+        .template-button {
+            background-color: #34a853;
+            color: white;
+            margin-right: 8px;
+        }
+        .template-button:hover {
+            background-color: #2e7d32;
+        }
+        .required {
+            color: #d93025;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 4px;
+        }
+        .template-section {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        .template-section h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+        }
+        .template-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .template-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .template-btn:hover {
+            background-color: #bbdefb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Log Communication</h2>
+        
+        <div class="template-section">
+            <h4>Quick Templates</h4>
+            <div class="template-buttons">
+                <button class="template-btn" onclick="loadTemplate('initial_request')">Initial Style Guide Request</button>
+                <button class="template-btn" onclick="loadTemplate('conflict_resolution')">Style Conflict Resolution</button>
+                <button class="template-btn" onclick="loadTemplate('approval_request')">Approval Request</button>
+                <button class="template-btn" onclick="loadTemplate('status_update')">Project Status Update</button>
+            </div>
+        </div>
+        
+        <form id="communicationForm">
+            <div class="form-group">
+                <label for="clientName">Client Name <span class="required">*</span></label>
+                <input type="text" id="clientName" name="clientName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="communicationType">Communication Type <span class="required">*</span></label>
+                <select id="communicationType" name="communicationType" required>
+                    <option value="">Select type...</option>
+                    <option value="Email">Email</option>
+                    <option value="Meeting">Meeting</option>
+                    <option value="Call">Phone Call</option>
+                    <option value="Slack">Slack Message</option>
+                    <option value="Document">Document Review</option>
+                    <option value="Presentation">Presentation</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject <span class="required">*</span></label>
+                <input type="text" id="subject" name="subject" required placeholder="Brief description of communication topic">
+            </div>
+            
+            <div class="form-group">
+                <label for="participants">Participants</label>
+                <input type="text" id="participants" name="participants" placeholder="Names or emails of participants">
+                <div class="help-text">Separate multiple participants with commas</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="keyPoints">Key Points Discussed <span class="required">*</span></label>
+                <textarea id="keyPoints" name="keyPoints" rows="4" required placeholder="Main topics, decisions, concerns raised..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="actionItems">Action Items <span class="required">*</span></label>
+                <textarea id="actionItems" name="actionItems" rows="3" required placeholder="What needs to be done next, by whom, by when..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="followUpDate">Follow-up Date</label>
+                <input type="date" id="followUpDate" name="followUpDate">
+                <div class="help-text">When to check back on this communication</div>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" class="template-button" onclick="sendTemplatedEmail()">Send Template Email</button>
+                <button type="button" class="secondary-button" onclick="google.script.host.close()">Cancel</button>
+                <button type="submit" class="primary-button">Log Communication</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const templates = {
+            initial_request: {
+                subject: "Design System Requirements - Style Guide Collection",
+                keyPoints: "Requested client's design system materials including:\n- Global variables (colors, typography, spacing)\n- Component library specifications\n- Brand guidelines and assets\n- Portal-specific requirements",
+                actionItems: "Client to provide:\n- Figma file with organized components\n- Style guide documentation\n- Asset library\nTimeline: Within 1 week"
+            },
+            conflict_resolution: {
+                subject: "Design System Conflicts - Resolution Required",
+                keyPoints: "Identified conflicts between client design requirements and platform constraints:\n- Technical limitations discussed\n- UX best practice concerns raised\n- Alternative solutions proposed",
+                actionItems: "Schedule design review call to:\n- Review conflict analysis document\n- Discuss proposed solutions\n- Get client approval on recommendations"
+            },
+            approval_request: {
+                subject: "Design System Mapping - Approval Request",
+                keyPoints: "Completed mapping between client variables and company design system:\n- All major components mapped\n- CSS variable naming conventions established\n- Implementation approach confirmed",
+                actionItems: "Client to review mapping document and provide approval\nDevelopment team to begin CSS generation upon approval"
+            },
+            status_update: {
+                subject: "Design System Implementation - Status Update",
+                keyPoints: "Project progress update:\n- Variables mapped and approved\n- CSS generation in progress\n- Portal implementation timeline confirmed",
+                actionItems: "Continue with scheduled development phases\nNext milestone review scheduled"
+            }
+        };
+        
+        function loadTemplate(templateKey) {
+            const template = templates[templateKey];
+            if (template) {
+                document.getElementById('subject').value = template.subject;
+                document.getElementById('keyPoints').value = template.keyPoints;
+                document.getElementById('actionItems').value = template.actionItems;
+            }
+        }
+        
+        document.getElementById('communicationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Validate required fields
+            if (!data.clientName || !data.communicationType || !data.subject || !data.keyPoints || !data.actionItems) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Convert follow-up date
+            const followUpDate = data.followUpDate ? new Date(data.followUpDate) : null;
+            
+            // Call the server function
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    alert('Communication logged successfully!');
+                    google.script.host.close();
+                })
+                .withFailureHandler(function(error) {
+                    alert('Error logging communication: ' + error.message);
+                })
+                .logCommunication(
+                    data.clientName,
+                    data.communicationType,
+                    data.subject,
+                    data.participants || '',
+                    data.keyPoints,
+                    data.actionItems,
+                    followUpDate
+                );
+        });
+        
+        function sendTemplatedEmail() {
+            const clientName = document.getElementById('clientName').value;
+            if (!clientName) {
+                alert('Please enter client name first.');
+                return;
+            }
+            
+            const subject = document.getElementById('subject').value;
+            const keyPoints = document.getElementById('keyPoints').value;
+            
+            if (!subject || !keyPoints) {
+                alert('Please fill in subject and key points to send template email.');
+                return;
+            }
+            
+            // This would integrate with your email template system
+            alert('Template email functionality would integrate with your email system.\nFor now, communication has been logged.');
+            
+            // Log this as sent communication
+            document.getElementById('communicationType').value = 'Email';
+            document.getElementById('communicationForm').dispatchEvent(new Event('submit'));
+        }
+    </script>
+</body>
+</html>

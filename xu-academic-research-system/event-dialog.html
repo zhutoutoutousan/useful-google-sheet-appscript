@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Schedule Event</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+            min-height: 100vh;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .event-type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .event-type {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid transparent;
+            padding: 20px 15px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .event-type:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        .event-type.selected {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .event-icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .event-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-row-three {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .success-message,
+        .error-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .location-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .location-toggle {
+            background: #f8f9fa;
+            border: 2px solid #e0e6ed;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .location-toggle.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .datetime-preview {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .capacity-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e0e6ed;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        
+        .capacity-slider::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .capacity-display {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+        
+        .member-dropdown {
+            position: relative;
+        }
+        
+        .member-search {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .member-dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .member-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .member-option:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h2>📅 Schedule Event</h2>
+            <p>Organize academic events and activities</p>
+        </div>
+        
+        <form id="eventForm">
+            <div id="messageContainer"></div>
+            
+            <div class="form-group">
+                <label>Event Type <span class="required">*</span></label>
+                <div class="event-type-selector">
+                    <div class="event-type" data-type="Conference">
+                        <span class="event-icon">🎤</span>
+                        <div class="event-name">Conference</div>
+                    </div>
+                    <div class="event-type" data-type="Workshop">
+                        <span class="event-icon">🛠️</span>
+                        <div class="event-name">Workshop</div>
+                    </div>
+                    <div class="event-type" data-type="Seminar">
+                        <span class="event-icon">🎓</span>
+                        <div class="event-name">Seminar</div>
+                    </div>
+                    <div class="event-type" data-type="Lecture">
+                        <span class="event-icon">📚</span>
+                        <div class="event-name">Lecture</div>
+                    </div>
+                    <div class="event-type" data-type="Networking">
+                        <span class="event-icon">🤝</span>
+                        <div class="event-name">Networking</div>
+                    </div>
+                    <div class="event-type" data-type="Social">
+                        <span class="event-icon">🎉</span>
+                        <div class="event-name">Social</div>
+                    </div>
+                </div>
+                <input type="hidden" id="selectedEventType" name="type" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="title">Event Title <span class="required">*</span></label>
+                <input type="text" id="title" name="title" required 
+                       placeholder="Enter event title...">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" 
+                          placeholder="Describe the event, agenda, and what participants can expect..."></textarea>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="date">Date <span class="required">*</span></label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="time">Time <span class="required">*</span></label>
+                    <input type="time" id="time" name="time" required>
+                </div>
+            </div>
+            
+            <div class="datetime-preview" id="datetimePreview">
+                Event scheduled for: Not set
+            </div>
+            
+            <div class="form-group">
+                <label>Location Type</label>
+                <div class="location-options">
+                    <div class="location-toggle" data-location="physical">🏢 Physical</div>
+                    <div class="location-toggle" data-location="virtual">💻 Virtual</div>
+                    <div class="location-toggle" data-location="hybrid">🔗 Hybrid</div>
+                </div>
+                <input type="hidden" id="locationType" name="locationType">
+            </div>
+            
+            <div class="form-group">
+                <label for="location">Location/URL <span class="required">*</span></label>
+                <input type="text" id="location" name="location" required 
+                       placeholder="Enter venue address or meeting URL...">
+            </div>
+            
+            <div class="form-group member-dropdown">
+                <label for="organizerSearch">Organizer <span class="required">*</span></label>
+                <input type="text" id="organizerSearch" class="member-search" 
+                       placeholder="Search for organizer..." autocomplete="off">
+                <div id="organizerDropdown" class="member-dropdown-list"></div>
+                <input type="hidden" id="selectedOrganizerId" name="organizerId" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="capacity">Maximum Capacity</label>
+                <input type="range" id="capacity" name="capacity" class="capacity-slider" 
+                       min="5" max="500" value="50">
+                <div class="capacity-display">
+                    <span id="capacityValue">50</span> participants
+                </div>
+            </div>
+            
+            <div class="form-row-three">
+                <div class="form-group">
+                    <label for="duration">Duration (hours)</label>
+                    <input type="number" id="duration" name="duration" min="0.5" step="0.5" 
+                           placeholder="2.0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="registrationDeadline">Registration Deadline</label>
+                    <input type="date" id="registrationDeadline" name="registrationDeadline">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cost">Cost ($)</label>
+                    <input type="number" id="cost" name="cost" min="0" step="10" 
+                           placeholder="0">
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary" onclick="google.script.host.close()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Schedule Event
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        let selectedEventType = '';
+        let selectedLocationType = '';
+        let members = [];
+        
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMembers();
+            setupEventListeners();
+            
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+            
+            // Set default time to next hour
+            const now = new Date();
+            const nextHour = new Date(now.getTime() + 60 * 60 * 1000);
+            document.getElementById('time').value = nextHour.toTimeString().slice(0, 5);
+            
+            updateDateTimePreview();
+        });
+        
+        function setupEventListeners() {
+            // Event type selection
+            document.querySelectorAll('.event-type').forEach(type => {
+                type.addEventListener('click', function() {
+                    document.querySelectorAll('.event-type').forEach(t => t.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedEventType = this.dataset.type;
+                    document.getElementById('selectedEventType').value = selectedEventType;
+                });
+            });
+            
+            // Location type selection
+            document.querySelectorAll('.location-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    document.querySelectorAll('.location-toggle').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedLocationType = this.dataset.location;
+                    document.getElementById('locationType').value = selectedLocationType;
+                    updateLocationPlaceholder();
+                });
+            });
+            
+            // Date and time change
+            document.getElementById('date').addEventListener('change', updateDateTimePreview);
+            document.getElementById('time').addEventListener('change', updateDateTimePreview);
+            
+            // Capacity slider
+            const capacitySlider = document.getElementById('capacity');
+            const capacityValue = document.getElementById('capacityValue');
+            capacitySlider.addEventListener('input', function() {
+                capacityValue.textContent = this.value;
+            });
+            
+            // Organizer search
+            setupMemberSearch();
+        }
+        
+        function setupMemberSearch() {
+            const searchInput = document.getElementById('organizerSearch');
+            const dropdown = document.getElementById('organizerDropdown');
+            
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterMembers(query);
+            });
+            
+            searchInput.addEventListener('focus', function() {
+                dropdown.style.display = 'block';
+                filterMembers(this.value.toLowerCase());
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.member-dropdown')) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        }
+        
+        function loadMembers() {
+            google.script.run
+                .withSuccessHandler(function(memberList) {
+                    members = memberList;
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading members:', error);
+                })
+                .getAllMembers();
+        }
+        
+        function filterMembers(query) {
+            const dropdown = document.getElementById('organizerDropdown');
+            dropdown.innerHTML = '';
+            
+            let filteredMembers = members;
+            if (query) {
+                filteredMembers = members.filter(member => 
+                    member.name.toLowerCase().includes(query) || 
+                    member.email.toLowerCase().includes(query)
+                );
+            }
+            
+            filteredMembers.forEach(member => {
+                const option = document.createElement('div');
+                option.className = 'member-option';
+                option.innerHTML = `<strong>${member.name}</strong><br><small>${member.email}</small>`;
+                option.addEventListener('click', function() {
+                    selectMember(member);
+                });
+                dropdown.appendChild(option);
+            });
+        }
+        
+        function selectMember(member) {
+            document.getElementById('organizerSearch').value = member.name;
+            document.getElementById('selectedOrganizerId').value = member.id;
+            document.getElementById('organizerDropdown').style.display = 'none';
+        }
+        
+        function updateDateTimePreview() {
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const preview = document.getElementById('datetimePreview');
+            
+            if (date && time) {
+                const eventDate = new Date(`${date}T${time}`);
+                const options = { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                preview.textContent = `Event scheduled for: ${eventDate.toLocaleDateString('en-US', options)}`;
+            } else {
+                preview.textContent = 'Event scheduled for: Not set';
+            }
+        }
+        
+        function updateLocationPlaceholder() {
+            const locationInput = document.getElementById('location');
+            
+            switch(selectedLocationType) {
+                case 'physical':
+                    locationInput.placeholder = 'Enter venue address (e.g., 123 University Ave, Room 101)';
+                    break;
+                case 'virtual':
+                    locationInput.placeholder = 'Enter meeting URL (e.g., https://zoom.us/j/123456789)';
+                    break;
+                case 'hybrid':
+                    locationInput.placeholder = 'Enter venue address and meeting URL';
+                    break;
+                default:
+                    locationInput.placeholder = 'Enter venue address or meeting URL...';
+            }
+        }
+        
+        // Form submission
+        document.getElementById('eventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Scheduling...';
+            submitBtn.disabled = true;
+            
+            const formData = collectFormData();
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    submitBtn.textContent = 'Schedule Event';
+                    submitBtn.disabled = false;
+                    
+                    if (result.success) {
+                        showMessage('success', result.message);
+                        setTimeout(() => {
+                            google.script.host.close();
+                        }, 2000);
+                    } else {
+                        showMessage('error', result.message);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    submitBtn.textContent = 'Schedule Event';
+                    submitBtn.disabled = false;
+                    showMessage('error', 'Error: ' + error.message);
+                })
+                .scheduleEvent(formData);
+        });
+        
+        function validateForm() {
+            const requiredFields = ['selectedEventType', 'title', 'date', 'time', 'location', 'selectedOrganizerId'];
+            let isValid = true;
+            
+            if (!selectedEventType) {
+                showMessage('error', 'Please select an event type');
+                isValid = false;
+            }
+            
+            if (!selectedLocationType) {
+                showMessage('error', 'Please select a location type');
+                isValid = false;
+            }
+            
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (!field.value.trim()) {
+                    isValid = false;
+                }
+            });
+            
+            // Validate date is not in the past
+            const eventDate = new Date(`${document.getElementById('date').value}T${document.getElementById('time').value}`);
+            if (eventDate < new Date()) {
+                showMessage('error', 'Event date and time cannot be in the past');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                showMessage('error', 'Please fill in all required fields');
+            }
+            
+            return isValid;
+        }
+        
+        function collectFormData() {
+            return {
+                type: selectedEventType,
+                title: document.getElementById('title').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                locationType: selectedLocationType,
+                location: document.getElementById('location').value.trim(),
+                organizerId: document.getElementById('selectedOrganizerId').value,
+                maxCapacity: document.getElementById('capacity').value,
+                duration: document.getElementById('duration').value || '2',
+                registrationDeadline: document.getElementById('registrationDeadline').value,
+                cost: document.getElementById('cost').value || '0'
+            };
+        }
+        
+        function showMessage(type, message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageClass = type === 'success' ? 'success-message' : 'error-message';
+            
+            messageContainer.innerHTML = `<div class="${messageClass}">${message}</div>`;
+            
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

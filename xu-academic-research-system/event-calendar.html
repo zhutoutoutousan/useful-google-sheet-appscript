@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Event Calendar - Cyberpunk Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Time matrix background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(0deg, transparent 24px, rgba(0, 255, 65, 0.03) 25px, rgba(0, 255, 65, 0.03) 26px, transparent 27px),
+                linear-gradient(90deg, transparent 24px, rgba(0, 255, 255, 0.03) 25px, rgba(0, 255, 255, 0.03) 26px, transparent 27px);
+            background-size: 25px 25px;
+            animation: time-flow 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes time-flow {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(25px, 25px); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                45deg,
+                rgba(0, 255, 255, 0.1) 0%,
+                rgba(0, 255, 65, 0.1) 25%,
+                rgba(255, 0, 128, 0.1) 50%,
+                rgba(128, 0, 255, 0.1) 75%,
+                rgba(0, 255, 255, 0.1) 100%
+            );
+            animation: calendar-pulse 5s ease-in-out infinite;
+        }
+        
+        @keyframes calendar-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #00ff41;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .calendar-controls {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .month-navigation {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(45deg, #00ff41, #00ffff);
+            color: #000;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+        
+        .nav-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+        
+        .current-month {
+            font-size: 1.5rem;
+            color: #00ffff;
+            font-weight: bold;
+            text-shadow: 0 0 5px #00ffff;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .calendar-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(45deg, #ff0080, #8000ff);
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.5);
+        }
+        
+        .calendar-grid {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+        }
+        
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            background: linear-gradient(45deg, #00ffff, #00ff41);
+        }
+        
+        .day-header {
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #000;
+            font-size: 1rem;
+            background: rgba(0, 0, 0, 0.1);
+            border-right: 1px solid rgba(0, 0, 0, 0.2);
+        }
+        
+        .day-header:last-child {
+            border-right: none;
+        }
+        
+        .calendar-body {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            min-height: 500px;
+        }
+        
+        .calendar-day {
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 8px;
+            position: relative;
+            min-height: 80px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .calendar-day:hover {
+            background: rgba(0, 255, 255, 0.1);
+            border-color: #00ffff;
+            box-shadow: inset 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.3;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .calendar-day.today {
+            background: linear-gradient(45deg, rgba(0, 255, 65, 0.3), rgba(0, 255, 255, 0.3));
+            border: 2px solid #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+        
+        .calendar-day.has-events {
+            border-left: 4px solid #ff0080;
+        }
+        
+        .day-number {
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .day-events {
+            font-size: 0.7rem;
+            line-height: 1.2;
+        }
+        
+        .event-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 1px;
+            animation: event-pulse 2s infinite;
+        }
+        
+        @keyframes event-pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        .event-conference { background: #ff0080; }
+        .event-workshop { background: #00ffff; }
+        .event-meeting { background: #00ff41; }
+        .event-deadline { background: #ff8000; }
+        .event-other { background: #8000ff; }
+        
+        .event-mini {
+            font-size: 0.6rem;
+            color: #cccccc;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 1px 0;
+            padding: 1px 2px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .events-sidebar {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #ff0080;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.2);
+        }
+        
+        .sidebar-title {
+            font-size: 1.3rem;
+            color: #ff0080;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #ff0080;
+            text-align: center;
+        }
+        
+        .upcoming-events {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .upcoming-events::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .upcoming-events::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        .upcoming-events::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ff0080, #8000ff);
+            border-radius: 4px;
+        }
+        
+        .event-item {
+            background: rgba(255, 0, 128, 0.1);
+            border: 1px solid rgba(255, 0, 128, 0.3);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .event-item:hover {
+            background: rgba(255, 0, 128, 0.2);
+            border-color: #ff0080;
+            transform: translateX(5px);
+        }
+        
+        .event-title {
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .event-details {
+            font-size: 0.8rem;
+            color: #cccccc;
+            line-height: 1.3;
+        }
+        
+        .event-time {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .event-type-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-right: 5px;
+        }
+        
+        .type-conference { background: #ff0080; color: #fff; }
+        .type-workshop { background: #00ffff; color: #000; }
+        .type-meeting { background: #00ff41; color: #000; }
+        .type-deadline { background: #ff8000; color: #000; }
+        .type-other { background: #8000ff; color: #fff; }
+        
+        .calendar-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+        }
+        
+        .quick-add {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .quick-add-title {
+            color: #00ff41;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .quick-form {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .quick-input {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            color: #00ff41;
+            padding: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+        }
+        
+        .quick-input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+        }
+        
+        .quick-btn {
+            background: linear-gradient(45deg, #00ff41, #00ffff);
+            color: #000;
+            border: none;
+            padding: 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+        
+        .quick-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 EVENT CALENDAR</h1>
+            <p>Temporal coordination and scheduling matrix</p>
+        </div>
+        
+        <div class="calendar-controls">
+            <div class="month-navigation">
+                <button class="nav-btn" onclick="previousMonth()">◀ PREV</button>
+                <div class="current-month" id="currentMonth">LOADING...</div>
+                <button class="nav-btn" onclick="nextMonth()">NEXT ▶</button>
+            </div>
+            
+            <div class="calendar-actions">
+                <button class="action-btn" onclick="showToday()">📍 Today</button>
+                <button class="action-btn" onclick="addEvent()">➕ Add Event</button>
+                <button class="action-btn" onclick="refreshCalendar()">🔄 Refresh</button>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            Synchronizing temporal data...
+        </div>
+        
+        <div id="calendarContent" class="calendar-layout" style="display: none;">
+            <div>
+                <div class="calendar-grid">
+                    <div class="calendar-header">
+                        <div class="day-header">SUN</div>
+                        <div class="day-header">MON</div>
+                        <div class="day-header">TUE</div>
+                        <div class="day-header">WED</div>
+                        <div class="day-header">THU</div>
+                        <div class="day-header">FRI</div>
+                        <div class="day-header">SAT</div>
+                    </div>
+                    <div class="calendar-body" id="calendarBody">
+                        <!-- Calendar days will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="events-sidebar">
+                <div class="sidebar-title">⚡ Upcoming Events</div>
+                <div class="upcoming-events" id="upcomingEvents">
+                    <!-- Events will be populated here -->
+                </div>
+                
+                <div class="quick-add">
+                    <div class="quick-add-title">🚀 Quick Add Event</div>
+                    <div class="quick-form">
+                        <input type="text" id="quickTitle" class="quick-input" placeholder="Event title...">
+                        <input type="date" id="quickDate" class="quick-input">
+                        <input type="time" id="quickTime" class="quick-input">
+                        <select id="quickType" class="quick-input">
+                            <option value="meeting">Meeting</option>
+                            <option value="workshop">Workshop</option>
+                            <option value="conference">Conference</option>
+                            <option value="deadline">Deadline</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <button class="quick-btn" onclick="quickAddEvent()">➕ ADD EVENT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="noData" class="no-data" style="display: none;">
+            <h3>🤖 Calendar initialization required</h3>
+            <p>Loading temporal coordination systems...</p>
+        </div>
+    </div>
+    
+    <script>
+        let currentDate = new Date();
+        let eventsData = [];
+        
+        // Pre-loaded data from template
+        let calendarData = <?= JSON.stringify(calendarData) ?>;
+        
+        // Load calendar on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[EVENT-CALENDAR] 🌟 Page loaded, starting initialization');
+            loadCalendar();
+            setupQuickForm();
+        });
+        
+        function setupQuickForm() {
+            // Set default date to today
+            const today = new Date();
+            document.getElementById('quickDate').value = today.toISOString().split('T')[0];
+            document.getElementById('quickTime').value = '09:00';
+        }
+        
+        function loadCalendar() {
+            console.log('[EVENT-CALENDAR] 🚀 Starting loadCalendar()');
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('calendarContent').style.display = 'none';
+            document.getElementById('noData').style.display = 'none';
+            
+            console.log('[EVENT-CALENDAR] 📊 Using pre-loaded data from template');
+            console.log('[EVENT-CALENDAR] 📊 Template data:', calendarData);
+            
+            // Use pre-loaded data instead of google.script.run
+            if (typeof calendarData === 'string') {
+                calendarData = JSON.parse(calendarData);
+            }
+            
+            console.log('[EVENT-CALENDAR] ✅ Received data from backend:', calendarData);
+            console.log('[EVENT-CALENDAR] 📊 Data type:', typeof calendarData);
+            console.log('[EVENT-CALENDAR] 📊 Data structure:', calendarData);
+            
+            if (!calendarData || !calendarData.events) {
+                console.log('[EVENT-CALENDAR] ❌ No events data received');
+                handleError('No calendar data available');
+                return;
+            }
+            
+            displayCalendar(calendarData);
+        }
+        
+        function displayCalendar(data) {
+            console.log('[EVENT-CALENDAR] 🎯 displayCalendar called with:', data);
+            document.getElementById('loading').style.display = 'none';
+            
+            if (!data || !data.events) {
+                console.log('[EVENT-CALENDAR] ❌ No events in data');
+                handleError('Invalid calendar data structure');
+                return;
+            }
+            
+            eventsData = data.events || [];
+            console.log('[EVENT-CALENDAR] 📊 Events data loaded:', eventsData.length, 'events');
+            
+            // Update current month display
+            const monthNames = [
+                'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+                'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
+            ];
+            document.getElementById('currentMonth').textContent = 
+                `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            
+            // Generate calendar grid
+            generateCalendarGrid();
+            
+            // Display upcoming events
+            displayUpcomingEvents();
+            
+            document.getElementById('calendarContent').style.display = 'grid';
+        }
+        
+        function generateCalendarGrid() {
+            const calendarBody = document.getElementById('calendarBody');
+            calendarBody.innerHTML = '';
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // First day of the month
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // Start from Sunday of the week containing the first day
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - startDate.getDay());
+            
+            const today = new Date();
+            
+            // Generate 6 weeks (42 days)
+            for (let i = 0; i < 42; i++) {
+                const cellDate = new Date(startDate);
+                cellDate.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                // Add classes for styling
+                if (cellDate.getMonth() !== month) {
+                    dayElement.classList.add('other-month');
+                }
+                
+                if (cellDate.toDateString() === today.toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // Get events for this day
+                const dayEvents = getDayEvents(cellDate);
+                if (dayEvents.length > 0) {
+                    dayElement.classList.add('has-events');
+                }
+                
+                // Create day content
+                dayElement.innerHTML = `
+                    <div class="day-number">${cellDate.getDate()}</div>
+                    <div class="day-events">
+                        ${dayEvents.map(event => `
+                            <div class="event-mini" title="${event.title}">${event.title}</div>
+                        `).join('')}
+                        ${dayEvents.map(event => `
+                            <span class="event-dot event-${event.type}"></span>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Add click handler
+                dayElement.addEventListener('click', () => selectDay(cellDate));
+                
+                calendarBody.appendChild(dayElement);
+            }
+        }
+        
+        function getDayEvents(date) {
+            return eventsData.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate.toDateString() === date.toDateString();
+            });
+        }
+        
+        function displayUpcomingEvents() {
+            const container = document.getElementById('upcomingEvents');
+            container.innerHTML = '';
+            
+            // Get events for the next 30 days
+            const today = new Date();
+            const thirtyDaysLater = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+            
+            const upcomingEvents = eventsData.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate >= today && eventDate <= thirtyDaysLater;
+            }).sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            if (upcomingEvents.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No upcoming events</div>';
+                return;
+            }
+            
+            upcomingEvents.slice(0, 10).forEach(event => {
+                const eventDiv = document.createElement('div');
+                eventDiv.className = 'event-item';
+                
+                const eventDate = new Date(event.date);
+                const timeStr = event.time ? ` at ${event.time}` : '';
+                
+                eventDiv.innerHTML = `
+                    <div class="event-title">
+                        <span class="event-type-badge type-${event.type}">${event.type}</span>
+                        ${event.title}
+                    </div>
+                    <div class="event-details">
+                        <div class="event-time">${eventDate.toLocaleDateString()}${timeStr}</div>
+                        ${event.location ? `<div>📍 ${event.location}</div>` : ''}
+                        ${event.description ? `<div>${event.description}</div>` : ''}
+                    </div>
+                `;
+                
+                eventDiv.addEventListener('click', () => viewEvent(event));
+                container.appendChild(eventDiv);
+            });
+        }
+        
+        function selectDay(date) {
+            const dayEvents = getDayEvents(date);
+            if (dayEvents.length > 0) {
+                showDayEvents(date, dayEvents);
+            } else {
+                // Set quick add form to selected date
+                document.getElementById('quickDate').value = date.toISOString().split('T')[0];
+            }
+        }
+        
+        function showDayEvents(date, events) {
+            const eventsList = events.map(event => 
+                `• ${event.title} (${event.type})${event.time ? ` at ${event.time}` : ''}`
+            ).join('\\n');
+            
+            alert(`📅 Events for ${date.toLocaleDateString()}:\\n\\n${eventsList}`);
+        }
+        
+        function viewEvent(event) {
+            const details = `
+📋 ${event.title}
+📅 ${new Date(event.date).toLocaleDateString()}
+⏰ ${event.time || 'All day'}
+📍 ${event.location || 'No location specified'}
+🏷️ Type: ${event.type}
+📝 ${event.description || 'No description'}
+            `.trim();
+            
+            alert(details);
+        }
+        
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            loadCalendar();
+        }
+        
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            loadCalendar();
+        }
+        
+        function showToday() {
+            currentDate = new Date();
+            loadCalendar();
+        }
+        
+        function addEvent() {
+            // This would typically open the full event dialog
+            google.script.run.showEventDialog();
+        }
+        
+        function quickAddEvent() {
+            const title = document.getElementById('quickTitle').value.trim();
+            const date = document.getElementById('quickDate').value;
+            const time = document.getElementById('quickTime').value;
+            const type = document.getElementById('quickType').value;
+            
+            if (!title || !date) {
+                alert('⚠️ Please provide at least a title and date');
+                return;
+            }
+            
+            const eventData = {
+                title: title,
+                date: date,
+                time: time,
+                type: type,
+                description: 'Added via quick form',
+                location: ''
+            };
+            
+            google.script.run
+                .withSuccessHandler((result) => {
+                    if (result.success) {
+                        alert('✅ Event added successfully!');
+                        // Clear form
+                        document.getElementById('quickTitle').value = '';
+                        setupQuickForm();
+                        // Reload calendar
+                        loadCalendar();
+                    } else {
+                        alert('❌ Error adding event: ' + result.message);
+                    }
+                })
+                .withFailureHandler(handleError)
+                .addQuickEvent(eventData);
+        }
+        
+        function refreshCalendar() {
+            loadCalendar();
+        }
+        
+        function handleError(error) {
+            console.log('[EVENT-CALENDAR] ❌ Error occurred:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+            console.error('Error loading calendar:', error);
+        }
+    </script>
+</body>
+</html>

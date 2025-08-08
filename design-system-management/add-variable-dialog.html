@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <style>
+        body {
+            font-family: 'Google Sans', sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        .button-group {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .primary-button {
+            background-color: #4285f4;
+            color: white;
+        }
+        .primary-button:hover {
+            background-color: #3367d6;
+        }
+        .secondary-button {
+            background-color: #f8f9fa;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+        }
+        .secondary-button:hover {
+            background-color: #f1f3f4;
+        }
+        .required {
+            color: #d93025;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add Client Design Variable</h2>
+        <form id="variableForm">
+            <div class="form-group">
+                <label for="clientName">Client Name <span class="required">*</span></label>
+                <input type="text" id="clientName" name="clientName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="portalType">Portal Type <span class="required">*</span></label>
+                <select id="portalType" name="portalType" required>
+                    <option value="">Select portal type...</option>
+                    <option value="Hiring Manager">Hiring Manager</option>
+                    <option value="Careers">Careers</option>
+                    <option value="Employee Portal">Employee Portal</option>
+                    <option value="Admin Portal">Admin Portal</option>
+                    <option value="Reports Portal">Reports Portal</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="category">Category <span class="required">*</span></label>
+                <select id="category" name="category" required>
+                    <option value="">Select category...</option>
+                    <option value="Colors">Colors</option>
+                    <option value="Typography">Typography</option>
+                    <option value="Spacing">Spacing</option>
+                    <option value="Components">Components</option>
+                    <option value="Layout">Layout</option>
+                    <option value="Animations">Animations</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="variableName">Variable Name <span class="required">*</span></label>
+                <input type="text" id="variableName" name="variableName" required placeholder="e.g., primary-color, header-font-size">
+                <div class="help-text">Use kebab-case naming convention</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="value">Value <span class="required">*</span></label>
+                <input type="text" id="value" name="value" required placeholder="e.g., #4285f4, 16px, Inter">
+                <div class="help-text">Provide the actual CSS value</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" name="type">
+                    <option value="Token">Design Token</option>
+                    <option value="Component">Component Style</option>
+                    <option value="Layout">Layout Property</option>
+                    <option value="Animation">Animation Property</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="context">Usage Context</label>
+                <input type="text" id="context" name="context" placeholder="e.g., Button primary state, Navigation links">
+                <div class="help-text">Where/how this variable is used</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <select id="priority" name="priority">
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Notes</label>
+                <textarea id="notes" name="notes" rows="3" placeholder="Additional information, constraints, or requirements"></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" class="secondary-button" onclick="google.script.host.close()">Cancel</button>
+                <button type="submit" class="primary-button">Add Variable</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('variableForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Validate required fields
+            if (!data.clientName || !data.portalType || !data.category || !data.variableName || !data.value) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Call the server function
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    alert('Variable added successfully!');
+                    google.script.host.close();
+                })
+                .withFailureHandler(function(error) {
+                    alert('Error adding variable: ' + error.message);
+                })
+                .addClientVariable(
+                    data.clientName,
+                    data.portalType,
+                    data.category,
+                    data.variableName,
+                    data.value,
+                    data.type || 'Token',
+                    data.context || '',
+                    data.priority || 'Medium',
+                    data.notes || ''
+                );
+        });
+        
+        // Auto-format variable name to kebab-case
+        document.getElementById('variableName').addEventListener('input', function(e) {
+            e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Analytics Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .analytics-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .card-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .metric-large {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            color: #2c3e50;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e6ed;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            position: relative;
+        }
+        
+        .skill-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .skill-item {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-item:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .skill-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .skill-level {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .timeline {
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .timeline-date {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            min-width: 120px;
+            text-align: center;
+        }
+        
+        .timeline-content {
+            flex: 1;
+            margin-left: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-desc {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .top-performers {
+            margin: 20px 0;
+        }
+        
+        .performer-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .performer-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .performer-rank {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .performer-info {
+            flex: 1;
+        }
+        
+        .performer-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .performer-score {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .activity-feed {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .activity-icon {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-text {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .activity-time {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+        }
+        
+        .trends-section {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .trends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .trend-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .trend-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .trend-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .trend-label {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .trend-change {
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+        
+        .trend-up {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .trend-down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .filter-controls {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-item label {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .filter-item select {
+            padding: 8px 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-item select:focus {
+            border-color: #667eea;
+        }
+        
+        .export-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="analytics-container">
+        <div class="header">
+            <h1 class="floating">📈 Analytics Hub</h1>
+            <p>Comprehensive insights into academic progress and system performance</p>
+        </div>
+        
+        <div class="filter-controls">
+            <div class="filter-item">
+                <label for="timeRange">Time Range:</label>
+                <select id="timeRange">
+                    <option value="7d">Last 7 days</option>
+                    <option value="30d" selected>Last 30 days</option>
+                    <option value="90d">Last 90 days</option>
+                    <option value="1y">Last year</option>
+                    <option value="all">All time</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="department">Department:</label>
+                <select id="department">
+                    <option value="all">All Departments</option>
+                    <option value="cs">Computer Science</option>
+                    <option value="math">Mathematics</option>
+                    <option value="physics">Physics</option>
+                    <option value="biology">Biology</option>
+                </select>
+            </div>
+            <div class="filter-item">
+                <label for="memberType">Member Type:</label>
+                <select id="memberType">
+                    <option value="all">All Members</option>
+                    <option value="student">Students</option>
+                    <option value="researcher">Researchers</option>
+                    <option value="professor">Professors</option>
+                </select>
+            </div>
+            <button class="export-btn" onclick="exportAnalytics()">📊 Export Report</button>
+        </div>
+        
+        <div class="analytics-grid">
+            <!-- Learning Analytics Card -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <span class="card-icon">📚</span>
+                    <h3 class="card-title">Learning Analytics</h3>
+                </div>
+                <div class="metric-large">247</div>
+                <div style="text-align: center; color: #7f8c8d; margin-bottom: 20px;">Total Learning Activities</div>
+                
+                <div class="metric-row">
+                    <span class="metric-label">YouTube Videos</span>
+                    <span class="metric-value">89 (36%)</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Online Courses</span>
+                    <span class="metric-value">64 (26%)</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Books</span>
+                    <span class="metric-value">42 (17%)</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Research Papers</span>
+                    <span class="metric-value">52 (21%)</span>
+                </div>
+            </div>
+            
+            <!-- Skill Development Card -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <span class="card-icon">🧠</span>
+                    <h3 class="card-title">Skill Development</h3>
+                </div>
+                <div class="skill-matrix">
+                    <div class="skill-item">
+                        <div class="skill-name">AI/ML</div>
+                        <div class="skill-level">8.2/10</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Programming</div>
+                        <div class="skill-level">7.8/10</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Statistics</div>
+                        <div class="skill-level">7.1/10</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Research</div>
+                        <div class="skill-level">8.5/10</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Communication</div>
+                        <div class="skill-level">7.3/10</div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-name">Critical Thinking</div>
+                        <div class="skill-level">8.0/10</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Project Performance Card -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <span class="card-icon">🚀</span>
+                    <h3 class="card-title">Project Performance</h3>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Active Projects</span>
+                    <span class="metric-value">12</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Completed This Month</span>
+                    <span class="metric-value">5</span>
+                </div>
+                <div class="metric-row">
+                    <span class="metric-label">Average Completion Rate</span>
+                    <span class="metric-value">87%</span>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>On Track</span>
+                        <span>75%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Performers Card -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <span class="card-icon">🏆</span>
+                    <h3 class="card-title">Top Performers</h3>
+                </div>
+                <div class="top-performers">
+                    <div class="performer-item">
+                        <div class="performer-rank">1</div>
+                        <div class="performer-info">
+                            <div class="performer-name">Dr. Sarah Chen</div>
+                            <div class="performer-score">95% completion rate</div>
+                        </div>
+                    </div>
+                    <div class="performer-item">
+                        <div class="performer-rank">2</div>
+                        <div class="performer-info">
+                            <div class="performer-name">Alex Rodriguez</div>
+                            <div class="performer-score">92% completion rate</div>
+                        </div>
+                    </div>
+                    <div class="performer-item">
+                        <div class="performer-rank">3</div>
+                        <div class="performer-info">
+                            <div class="performer-name">Prof. Michael Zhang</div>
+                            <div class="performer-score">89% completion rate</div>
+                        </div>
+                    </div>
+                    <div class="performer-item">
+                        <div class="performer-rank">4</div>
+                        <div class="performer-info">
+                            <div class="performer-name">Emma Johnson</div>
+                            <div class="performer-score">86% completion rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity Card -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <span class="card-icon">⚡</span>
+                    <h3 class="card-title">Recent Activity</h3>
+                </div>
+                <div class="activity-feed">
+                    <div class="activity-item">
+                        <div class="activity-icon">📚</div>
+                        <div class="activity-content">
+                            <div class="activity-text">New course completed: "Advanced Deep Learning"</div>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">🚀</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Project "AI Ethics Research" reached 90% completion</div>
+                            <div class="activity-time">5 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">💡</div>
+                        <div class="activity-content">
+                            <div class="activity-text">New academic idea submitted: "Quantum ML Applications"</div>
+                            <div class="activity-time">1 day ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">🧠</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Skill assessment completed for "Natural Language Processing"</div>
+                            <div class="activity-time">2 days ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">📅</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Event scheduled: "AI Research Symposium 2024"</div>
+                            <div class="activity-time">3 days ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Learning Timeline Card -->
+            <div class="analytics-card">
+                <div class="card-header">
+                    <span class="card-icon">📈</span>
+                    <h3 class="card-title">Learning Timeline</h3>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">Jan 2024</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Machine Learning Fundamentals</div>
+                            <div class="timeline-desc">Completed comprehensive ML course with 95% score</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Feb 2024</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Deep Learning Specialization</div>
+                            <div class="timeline-desc">Advanced neural networks and computer vision</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Mar 2024</div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Research Methodology</div>
+                            <div class="timeline-desc">Scientific writing and experimental design</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Trends Section -->
+        <div class="trends-section">
+            <div class="card-header">
+                <span class="card-icon">📊</span>
+                <h3 class="card-title">Key Performance Trends</h3>
+            </div>
+            <div class="trends-grid">
+                <div class="trend-item">
+                    <div class="trend-number">89%</div>
+                    <div class="trend-label">Learning Completion Rate</div>
+                    <div class="trend-change trend-up">↑ 12% from last month</div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-number">4.2</div>
+                    <div class="trend-label">Average Skill Level</div>
+                    <div class="trend-change trend-up">↑ 0.3 from last month</div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-number">156</div>
+                    <div class="trend-label">Hours Studied This Month</div>
+                    <div class="trend-change trend-up">↑ 28% from last month</div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-number">23</div>
+                    <div class="trend-label">New Ideas Submitted</div>
+                    <div class="trend-change trend-up">↑ 15% from last month</div>
+                </div>
+                <div class="trend-item">
+                    <div class="trend-number">94%</div>
+                    <div class="trend-label">Event Attendance Rate</div>
+                    <div class="trend-change trend-down">↓ 3% from last month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Initialize analytics dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAnalytics();
+            setupEventListeners();
+            animateProgressBars();
+            simulateRealTimeUpdates();
+        });
+        
+        function initializeAnalytics() {
+            // Load initial data
+            loadAnalyticsData();
+            
+            // Set up auto-refresh
+            setInterval(loadAnalyticsData, 30000); // Refresh every 30 seconds
+        }
+        
+        function setupEventListeners() {
+            // Filter change handlers
+            document.getElementById('timeRange').addEventListener('change', function() {
+                loadAnalyticsData();
+                showLoadingState();
+            });
+            
+            document.getElementById('department').addEventListener('change', function() {
+                loadAnalyticsData();
+                showLoadingState();
+            });
+            
+            document.getElementById('memberType').addEventListener('change', function() {
+                loadAnalyticsData();
+                showLoadingState();
+            });
+        }
+        
+        function loadAnalyticsData() {
+            const filters = {
+                timeRange: document.getElementById('timeRange').value,
+                department: document.getElementById('department').value,
+                memberType: document.getElementById('memberType').value
+            };
+            
+            // Simulate data loading with Google Apps Script
+            google.script.run
+                .withSuccessHandler(function(data) {
+                    updateAnalyticsDisplay(data);
+                    hideLoadingState();
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading analytics:', error);
+                    hideLoadingState();
+                })
+                .getAnalyticsData(filters);
+        }
+        
+        function updateAnalyticsDisplay(data) {
+            // Update metrics with new data
+            if (data) {
+                // Update learning activities count
+                const learningCount = document.querySelector('.metric-large');
+                if (learningCount) {
+                    animateNumber(learningCount, parseInt(learningCount.textContent), data.totalLearningActivities || 247);
+                }
+                
+                // Update other metrics as needed
+                console.log('Analytics data updated:', data);
+            }
+        }
+        
+        function animateNumber(element, start, end) {
+            const duration = 1000;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const current = Math.floor(start + (end - start) * progress);
+                element.textContent = current;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+        
+        function animateProgressBars() {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach((bar, index) => {
+                setTimeout(() => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                }, index * 200);
+            });
+        }
+        
+        function showLoadingState() {
+            const cards = document.querySelectorAll('.analytics-card');
+            cards.forEach(card => {
+                card.style.opacity = '0.7';
+                card.classList.add('shimmer');
+            });
+        }
+        
+        function hideLoadingState() {
+            const cards = document.querySelectorAll('.analytics-card');
+            cards.forEach(card => {
+                card.style.opacity = '1';
+                card.classList.remove('shimmer');
+            });
+        }
+        
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                // Add random activity to the feed
+                addRandomActivity();
+                
+                // Update some metrics randomly
+                updateRandomMetrics();
+            }, 10000); // Every 10 seconds
+        }
+        
+        function addRandomActivity() {
+            const activities = [
+                { icon: '📚', text: 'New learning activity logged', time: 'Just now' },
+                { icon: '🧠', text: 'Skill assessment completed', time: 'Just now' },
+                { icon: '💡', text: 'New idea submitted', time: 'Just now' },
+                { icon: '🚀', text: 'Project milestone reached', time: 'Just now' }
+            ];
+            
+            const activity = activities[Math.floor(Math.random() * activities.length)];
+            const feed = document.querySelector('.activity-feed');
+            
+            if (feed && Math.random() > 0.7) { // 30% chance
+                const activityElement = document.createElement('div');
+                activityElement.className = 'activity-item';
+                activityElement.innerHTML = `
+                    <div class="activity-icon">${activity.icon}</div>
+                    <div class="activity-content">
+                        <div class="activity-text">${activity.text}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                `;
+                
+                feed.insertBefore(activityElement, feed.firstChild);
+                
+                // Remove old activities to keep feed manageable
+                if (feed.children.length > 10) {
+                    feed.removeChild(feed.lastChild);
+                }
+                
+                // Animate new activity
+                activityElement.style.opacity = '0';
+                activityElement.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    activityElement.style.opacity = '1';
+                    activityElement.style.transform = 'translateX(0)';
+                    activityElement.style.transition = 'all 0.3s ease';
+                }, 100);
+            }
+        }
+        
+        function updateRandomMetrics() {
+            // Randomly update some trend numbers
+            const trendNumbers = document.querySelectorAll('.trend-number');
+            trendNumbers.forEach(number => {
+                if (Math.random() > 0.9) { // 10% chance
+                    const current = parseFloat(number.textContent);
+                    const change = (Math.random() - 0.5) * 0.1; // ±5% change
+                    const newValue = Math.max(0, current * (1 + change));
+                    
+                    if (number.textContent.includes('%')) {
+                        number.textContent = Math.round(newValue) + '%';
+                    } else if (number.textContent.includes('.')) {
+                        number.textContent = newValue.toFixed(1);
+                    } else {
+                        number.textContent = Math.round(newValue);
+                    }
+                }
+            });
+        }
+        
+        function exportAnalytics() {
+            const filters = {
+                timeRange: document.getElementById('timeRange').value,
+                department: document.getElementById('department').value,
+                memberType: document.getElementById('memberType').value
+            };
+            
+            // Generate analytics report
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    if (result.success) {
+                        alert('Analytics report exported successfully! Check your Google Drive.');
+                    } else {
+                        alert('Error exporting report: ' + result.message);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    alert('Error exporting report: ' + error.message);
+                })
+                .exportAnalyticsReport(filters);
+        }
+        
+        // Add hover effects for interactive elements
+        document.addEventListener('mouseover', function(e) {
+            if (e.target.closest('.analytics-card')) {
+                e.target.closest('.analytics-card').style.transform = 'translateY(-8px)';
+            }
+        });
+        
+        document.addEventListener('mouseout', function(e) {
+            if (e.target.closest('.analytics-card')) {
+                e.target.closest('.analytics-card').style.transform = 'translateY(-5px)';
+            }
+        });
+    </script>
+</body>
+</html>

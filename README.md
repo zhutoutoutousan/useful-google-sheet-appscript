@@ -26,6 +26,24 @@ This repository is your **one-stop destination** for cutting-edge Google Apps Sc
 
 ## 📦 What's Included
 
+### 🏛️ X.lab Chinese Student Center
+A comprehensive one-stop platform for Chinese students at XU Exponential University of Applied Sciences, featuring job opportunities, events, places, and community resources.
+
+**Features:**
+- 💼 **Job Management**: Post jobs, track applications, and manage the hiring process
+- 📅 **Event Management**: Create events with attendee tracking and waitlist management
+- 🗺️ **Location Services**: Interactive maps for Potsdam and Berlin with transportation info
+- 👥 **Community Hub**: Connect students and share resources
+- 🎯 **Quick Actions**: One-click access to common tasks
+- 📊 **Analytics Dashboard**: Real-time statistics and insights
+- 🌐 **Resource Library**: Useful websites and business opportunities
+
+**Perfect for:**
+- Chinese students at XU Exponential University
+- Student organizations and clubs
+- International student communities
+- Career development and networking
+
 ### 🧠 Language Memorization App
 A sophisticated spaced repetition system built entirely in Google Apps Script that helps you learn and retain vocabulary effectively.
 
@@ -58,6 +76,25 @@ A sophisticated spaced repetition system built entirely in Google Apps Script th
 4. **Copy the desired script** from the repository
 5. **Paste and save** in the Apps Script editor
 6. **Run the setup function** to initialize your spreadsheet
+
+### Example: Setting Up the X.lab Chinese Student Center
+
+```javascript
+// 1. Open your Google Sheet
+// 2. Go to Extensions > Apps Script
+// 3. Copy the main.gs content from chinese-student-center/
+// 4. Save and run initializeChineseStudentCenter()
+// 5. Refresh your spreadsheet to see the new menu and dashboard
+```
+
+### 🎯 Interactive Dashboard Features
+
+The Chinese Student Center features an innovative hexagonal grid layout with interactive elements:
+
+- **🎯 Quick Actions**: Click on any Quick Action button (Apply for Job, Register for Event, etc.) to execute the function directly
+- **🌍 Location Services**: Click on map links to open Google Maps for Potsdam and Berlin
+- **📊 Real-time Analytics**: Dashboard shows live statistics updated every 30 minutes
+- **🔗 Smart Navigation**: Click on module names to jump directly to that sheet
 
 ### Example: Setting Up the Language Memorization App
 

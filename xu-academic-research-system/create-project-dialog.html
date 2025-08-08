@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Create New Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+            min-height: 100vh;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            max-width: 800px;
+            margin: 0 auto;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-row-three {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .success-message,
+        .error-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .member-dropdown {
+            position: relative;
+        }
+        
+        .member-search {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .member-dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .member-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .member-option:hover {
+            background: #f8f9fa;
+        }
+        
+        .skill-tags-container {
+            margin-top: 10px;
+        }
+        
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .skill-tag {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .skill-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .skill-tag .remove {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .project-type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .type-option {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid transparent;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .type-option:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .type-option.selected {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .type-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .type-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .team-members-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .team-members-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .team-member-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .team-member-info {
+            flex: 1;
+        }
+        
+        .team-member-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .team-member-email {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .remove-member {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+        
+        .budget-input {
+            position: relative;
+        }
+        
+        .budget-input::before {
+            content: '$';
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-weight: bold;
+            z-index: 1;
+            margin-top: 15px;
+        }
+        
+        .budget-input input {
+            padding-left: 40px;
+        }
+        
+        .timeline-visual {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 6px;
+            border-radius: 3px;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .timeline-marker {
+            position: absolute;
+            top: -8px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .start-marker {
+            left: 0;
+            transform: translateX(-50%);
+        }
+        
+        .end-marker {
+            right: 0;
+            transform: translateX(50%);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h2>🚀 Create New Project</h2>
+            <p>Launch your next research or academic initiative</p>
+        </div>
+        
+        <form id="projectForm">
+            <div id="messageContainer"></div>
+            
+            <div class="form-group">
+                <label>Project Type</label>
+                <div class="project-type-selector">
+                    <div class="type-option" data-type="Research">
+                        <span class="type-icon">🔬</span>
+                        <div class="type-name">Research</div>
+                    </div>
+                    <div class="type-option" data-type="Development">
+                        <span class="type-icon">💻</span>
+                        <div class="type-name">Development</div>
+                    </div>
+                    <div class="type-option" data-type="Academic">
+                        <span class="type-icon">📚</span>
+                        <div class="type-name">Academic</div>
+                    </div>
+                    <div class="type-option" data-type="Innovation">
+                        <span class="type-icon">💡</span>
+                        <div class="type-name">Innovation</div>
+                    </div>
+                    <div class="type-option" data-type="Collaboration">
+                        <span class="type-icon">🤝</span>
+                        <div class="type-name">Collaboration</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="title">Project Title <span class="required">*</span></label>
+                <input type="text" id="title" name="title" required 
+                       placeholder="Enter a descriptive project title...">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Project Description <span class="required">*</span></label>
+                <textarea id="description" name="description" required
+                          placeholder="Describe the project objectives, methodology, and expected outcomes..."></textarea>
+            </div>
+            
+            <div class="form-group member-dropdown">
+                <label for="leaderSearch">Project Leader <span class="required">*</span></label>
+                <input type="text" id="leaderSearch" class="member-search" 
+                       placeholder="Search for project leader..." autocomplete="off">
+                <div id="leaderDropdown" class="member-dropdown-list"></div>
+                <input type="hidden" id="selectedLeaderId" name="leaderId" required>
+            </div>
+            
+            <div class="team-members-section">
+                <div class="team-members-header">
+                    <h3>Team Members</h3>
+                    <button type="button" class="btn btn-secondary" id="addMemberBtn">
+                        + Add Member
+                    </button>
+                </div>
+                <div class="member-dropdown" style="display: none;" id="memberSearchContainer">
+                    <input type="text" id="memberSearch" class="member-search" 
+                           placeholder="Search for team member..." autocomplete="off">
+                    <div id="memberDropdown" class="member-dropdown-list"></div>
+                </div>
+                <div id="teamMembersList"></div>
+                <input type="hidden" id="teamMembers" name="teamMembers">
+            </div>
+            
+            <div class="form-group">
+                <label for="skillsRequired">Required Skills</label>
+                <input type="text" id="skillsRequired" name="skillsRequired" 
+                       placeholder="Enter skills and press Enter or comma to add...">
+                <div class="skill-tags-container">
+                    <div class="skill-tags" id="skillTags"></div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="startDate">Start Date <span class="required">*</span></label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="endDate">Expected End Date</label>
+                    <input type="date" id="endDate" name="endDate">
+                </div>
+            </div>
+            
+            <div class="timeline-visual">
+                <div class="timeline-marker start-marker"></div>
+                <div class="timeline-marker end-marker"></div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group budget-input">
+                    <label for="budget">Budget (USD)</label>
+                    <input type="number" id="budget" name="budget" min="0" step="100"
+                           placeholder="0">
+                </div>
+                
+                <div class="form-group">
+                    <label for="repositoryUrl">Repository URL</label>
+                    <input type="url" id="repositoryUrl" name="repositoryUrl" 
+                           placeholder="https://github.com/username/project">
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary" onclick="google.script.host.close()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Create Project
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        let selectedType = '';
+        let members = [];
+        let teamMembers = [];
+        let skillsList = [];
+        
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMembers();
+            setupEventListeners();
+            document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+        });
+        
+        function setupEventListeners() {
+            // Project type selection
+            document.querySelectorAll('.type-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedType = this.dataset.type;
+                });
+            });
+            
+            // Leader search
+            setupMemberSearch('leaderSearch', 'leaderDropdown', function(member) {
+                document.getElementById('leaderSearch').value = member.name;
+                document.getElementById('selectedLeaderId').value = member.id;
+                document.getElementById('leaderDropdown').style.display = 'none';
+            });
+            
+            // Team member search
+            setupMemberSearch('memberSearch', 'memberDropdown', function(member) {
+                addTeamMember(member);
+                document.getElementById('memberSearch').value = '';
+                document.getElementById('memberDropdown').style.display = 'none';
+                document.getElementById('memberSearchContainer').style.display = 'none';
+            });
+            
+            // Add member button
+            document.getElementById('addMemberBtn').addEventListener('click', function() {
+                const container = document.getElementById('memberSearchContainer');
+                container.style.display = container.style.display === 'none' ? 'block' : 'none';
+                if (container.style.display === 'block') {
+                    document.getElementById('memberSearch').focus();
+                }
+            });
+            
+            // Skills input
+            const skillsInput = document.getElementById('skillsRequired');
+            skillsInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    addSkillTag(this.value.trim());
+                    this.value = '';
+                }
+            });
+            
+            skillsInput.addEventListener('blur', function() {
+                if (this.value.trim()) {
+                    addSkillTag(this.value.trim());
+                    this.value = '';
+                }
+            });
+        }
+        
+        function setupMemberSearch(searchId, dropdownId, selectCallback) {
+            const searchInput = document.getElementById(searchId);
+            const dropdown = document.getElementById(dropdownId);
+            
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterMembers(query, dropdownId);
+            });
+            
+            searchInput.addEventListener('focus', function() {
+                dropdown.style.display = 'block';
+                filterMembers(this.value.toLowerCase(), dropdownId);
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest(`#${searchId}`) && !e.target.closest(`#${dropdownId}`)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        }
+        
+        function loadMembers() {
+            google.script.run
+                .withSuccessHandler(function(memberList) {
+                    members = memberList;
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading members:', error);
+                })
+                .getAllMembers();
+        }
+        
+        function filterMembers(query, dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            dropdown.innerHTML = '';
+            
+            let filteredMembers = members;
+            if (query) {
+                filteredMembers = members.filter(member => 
+                    member.name.toLowerCase().includes(query) || 
+                    member.email.toLowerCase().includes(query)
+                );
+            }
+            
+            filteredMembers.forEach(member => {
+                const option = document.createElement('div');
+                option.className = 'member-option';
+                option.innerHTML = `<strong>${member.name}</strong><br><small>${member.email}</small>`;
+                option.addEventListener('click', function() {
+                    if (dropdownId === 'leaderDropdown') {
+                        document.getElementById('leaderSearch').value = member.name;
+                        document.getElementById('selectedLeaderId').value = member.id;
+                        dropdown.style.display = 'none';
+                    } else {
+                        addTeamMember(member);
+                        document.getElementById('memberSearch').value = '';
+                        dropdown.style.display = 'none';
+                        document.getElementById('memberSearchContainer').style.display = 'none';
+                    }
+                });
+                dropdown.appendChild(option);
+            });
+        }
+        
+        function addTeamMember(member) {
+            // Check if member already added
+            if (teamMembers.find(m => m.id === member.id)) {
+                showMessage('error', 'Member already added to team');
+                return;
+            }
+            
+            teamMembers.push(member);
+            updateTeamMembersList();
+            updateTeamMembersInput();
+        }
+        
+        function removeTeamMember(memberId) {
+            teamMembers = teamMembers.filter(m => m.id !== memberId);
+            updateTeamMembersList();
+            updateTeamMembersInput();
+        }
+        
+        function updateTeamMembersList() {
+            const container = document.getElementById('teamMembersList');
+            container.innerHTML = '';
+            
+            teamMembers.forEach(member => {
+                const item = document.createElement('div');
+                item.className = 'team-member-item';
+                item.innerHTML = `
+                    <div class="team-member-info">
+                        <div class="team-member-name">${member.name}</div>
+                        <div class="team-member-email">${member.email}</div>
+                    </div>
+                    <button type="button" class="remove-member" onclick="removeTeamMember('${member.id}')">
+                        Remove
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        function updateTeamMembersInput() {
+            const memberIds = teamMembers.map(m => m.id).join(',');
+            document.getElementById('teamMembers').value = memberIds;
+        }
+        
+        function addSkillTag(skill) {
+            if (!skill || skill.length < 2) return;
+            if (skillsList.includes(skill)) return;
+            
+            skillsList.push(skill);
+            updateSkillTags();
+        }
+        
+        function removeSkillTag(skill) {
+            skillsList = skillsList.filter(s => s !== skill);
+            updateSkillTags();
+        }
+        
+        function updateSkillTags() {
+            const container = document.getElementById('skillTags');
+            container.innerHTML = '';
+            
+            skillsList.forEach(skill => {
+                const tag = document.createElement('span');
+                tag.className = 'skill-tag';
+                tag.innerHTML = `${skill} <span class="remove" onclick="removeSkillTag('${skill}')">&times;</span>`;
+                container.appendChild(tag);
+            });
+        }
+        
+        // Form submission
+        document.getElementById('projectForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Creating...';
+            submitBtn.disabled = true;
+            
+            const formData = collectFormData();
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    submitBtn.textContent = 'Create Project';
+                    submitBtn.disabled = false;
+                    
+                    if (result.success) {
+                        showMessage('success', result.message);
+                        setTimeout(() => {
+                            google.script.host.close();
+                        }, 2000);
+                    } else {
+                        showMessage('error', result.message);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    submitBtn.textContent = 'Create Project';
+                    submitBtn.disabled = false;
+                    showMessage('error', 'Error: ' + error.message);
+                })
+                .createProject(formData);
+        });
+        
+        function validateForm() {
+            const requiredFields = ['title', 'description', 'selectedLeaderId', 'startDate'];
+            let isValid = true;
+            
+            if (!selectedType) {
+                showMessage('error', 'Please select a project type');
+                isValid = false;
+            }
+            
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (!field.value.trim()) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
+                showMessage('error', 'Please fill in all required fields');
+            }
+            
+            return isValid;
+        }
+        
+        function collectFormData() {
+            return {
+                type: selectedType,
+                title: document.getElementById('title').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                leaderId: document.getElementById('selectedLeaderId').value,
+                teamMembers: teamMembers.map(m => m.id).join(','),
+                skillsRequired: skillsList.join(', '),
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                budget: document.getElementById('budget').value || '0',
+                repositoryUrl: document.getElementById('repositoryUrl').value.trim()
+            };
+        }
+        
+        function showMessage(type, message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageClass = type === 'success' ? 'success-message' : 'error-message';
+            
+            messageContainer.innerHTML = `<div class="${messageClass}">${message}</div>`;
+            
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

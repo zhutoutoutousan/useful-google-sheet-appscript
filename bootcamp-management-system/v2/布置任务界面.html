@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>布置新任务</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 40px;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #9c27b0, #e91e63, #f44336, #ff9800);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #9c27b0, #e91e63);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #9c27b0;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .required {
+            color: #ea4335;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #9c27b0;
+            box-shadow: 0 0 0 3px rgba(156, 39, 176, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .student-select-container {
+            position: relative;
+        }
+        
+        .select-mode {
+            margin-bottom: 15px;
+        }
+        
+        .select-mode label {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 20px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        
+        .select-mode input[type="radio"] {
+            margin-right: 8px;
+            width: auto;
+        }
+        
+        .multi-select {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .student-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: background 0.2s ease;
+        }
+        
+        .student-option:hover {
+            background: #f0f0f0;
+        }
+        
+        .student-option input[type="checkbox"] {
+            margin-right: 10px;
+            width: auto;
+        }
+        
+        .student-info {
+            font-size: 14px;
+            color: #666;
+            margin-left: 5px;
+        }
+        
+        .difficulty-badges {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .difficulty-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .difficulty-badge.simple {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .difficulty-badge.medium {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        
+        .difficulty-badge.hard {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+        
+        .difficulty-badge.expert {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .difficulty-badge.selected {
+            border-color: currentColor;
+            transform: scale(1.05);
+        }
+        
+        .points-display {
+            margin-top: 10px;
+            padding: 10px;
+            background: linear-gradient(135deg, #fbc02d, #f57f17);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #9c27b0, #e91e63);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(156, 39, 176, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #5f6368;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e8eaed;
+            border-color: #c0c0c0;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .icon {
+            margin-right: 8px;
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #9c27b0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+            color: #137333;
+            font-weight: 500;
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 12px;
+            border-left: 5px solid #34a853;
+        }
+        
+        .error-message {
+            display: none;
+            text-align: center;
+            color: #d93025;
+            font-weight: 500;
+            margin-top: 20px;
+            padding: 15px;
+            background: #fce8e6;
+            border-radius: 12px;
+            border-left: 5px solid #ea4335;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row,
+            .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .difficulty-badges {
+                flex-wrap: wrap;
+            }
+            
+            .container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 布置新任务</h1>
+            <p>为学生创建学习任务和作业</p>
+        </div>
+        
+        <form id="taskForm">
+            <!-- 基本信息 -->
+            <div class="form-section">
+                <div class="section-title">
+                    📝 基本信息
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskTitle">任务标题 <span class="required">*</span></label>
+                    <input type="text" id="taskTitle" name="taskTitle" required placeholder="请输入任务标题">
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDescription">任务描述 <span class="required">*</span></label>
+                    <textarea id="taskDescription" name="taskDescription" required placeholder="请详细描述任务要求、学习目标和提交要求..."></textarea>
+                </div>
+                
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="taskType">任务类型 <span class="required">*</span></label>
+                        <select id="taskType" name="taskType" required>
+                            <option value="">请选择类型</option>
+                            <option value="日常任务">📅 日常任务</option>
+                            <option value="技术作业">💻 技术作业</option>
+                            <option value="英语练习">🗣️ 英语练习</option>
+                            <option value="项目任务">🚀 项目任务</option>
+                            <option value="考核任务">📊 考核任务</option>
+                            <option value="额外挑战">⭐ 额外挑战</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="difficulty">难度等级 <span class="required">*</span></label>
+                        <select id="difficulty" name="difficulty" required>
+                            <option value="">请选择难度</option>
+                            <option value="简单">🌱 简单</option>
+                            <option value="中等">📚 中等</option>
+                            <option value="困难">🚀 困难</option>
+                            <option value="专家">👑 专家</option>
+                        </select>
+                        <div class="points-display" id="pointsDisplay" style="display: none;">
+                            奖励积分: <span id="pointsValue">0</span> 分
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dueDate">截止日期 <span class="required">*</span></label>
+                        <input type="datetime-local" id="dueDate" name="dueDate" required>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 学生选择 -->
+            <div class="form-section">
+                <div class="section-title">
+                    👥 选择学生
+                </div>
+                
+                <div class="student-select-container">
+                    <div class="select-mode">
+                        <label>
+                            <input type="radio" name="selectMode" value="single" checked> 单个学生
+                        </label>
+                        <label>
+                            <input type="radio" name="selectMode" value="multiple"> 多个学生
+                        </label>
+                        <label>
+                            <input type="radio" name="selectMode" value="all"> 全班学生
+                        </label>
+                    </div>
+                    
+                    <div id="singleSelect" class="form-group">
+                        <label for="singleStudent">选择学生 <span class="required">*</span></label>
+                        <select id="singleStudent" name="singleStudent">
+                            <option value="">正在加载学生列表...</option>
+                        </select>
+                    </div>
+                    
+                    <div id="multipleSelect" class="form-group" style="display: none;">
+                        <label>选择多个学生 <span class="required">*</span></label>
+                        <div class="multi-select" id="studentList">
+                            正在加载学生列表...
+                        </div>
+                    </div>
+                    
+                    <div id="allSelect" class="form-group" style="display: none;">
+                        <div style="padding: 15px; background: #e3f2fd; border-radius: 8px; text-align: center;">
+                            📢 任务将分配给所有在读学生
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button type="button" class="btn btn-secondary" onclick="关闭对话框()">
+                    <span class="icon">❌</span>取消
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <span class="icon">✅</span>布置任务
+                </button>
+            </div>
+        </form>
+        
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            🎉 任务布置成功！
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            ❌ 布置失败，请检查输入信息
+        </div>
+    </div>
+
+    <script>
+        let studentsData = [];
+        let currentTeacherId = null;
+        
+        // 页面加载时设置默认截止日期（一周后）
+        const now = new Date();
+        const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        document.getElementById('dueDate').value = nextWeek.toISOString().slice(0, 16);
+        
+        // 加载学生列表
+        google.script.run
+            .withSuccessHandler(填充学生列表)
+            .withFailureHandler(处理学生加载错误)
+            .获取学生列表();
+        
+        // 获取当前教师信息（简化版本，实际应该通过用户认证获取）
+        google.script.run
+            .withSuccessHandler(function(teachers) {
+                if (teachers.length > 0) {
+                    currentTeacherId = teachers[0].id; // 使用第一个教师作为当前用户
+                }
+            })
+            .获取教师列表();
+        
+        function 填充学生列表(students) {
+            studentsData = students.filter(s => s.status === '在读');
+            
+            // 填充单选下拉列表
+            const singleSelect = document.getElementById('singleStudent');
+            singleSelect.innerHTML = '<option value="">请选择学生</option>';
+            
+            // 填充多选列表
+            const multipleSelect = document.getElementById('studentList');
+            multipleSelect.innerHTML = '';
+            
+            studentsData.forEach(student => {
+                // 单选选项
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.textContent = `${student.name} (${student.level})`;
+                singleSelect.appendChild(option);
+                
+                // 多选选项
+                const div = document.createElement('div');
+                div.className = 'student-option';
+                div.innerHTML = `
+                    <input type="checkbox" value="${student.id}" id="student_${student.id}">
+                    <label for="student_${student.id}">${student.name}</label>
+                    <span class="student-info">(${student.level})</span>
+                `;
+                multipleSelect.appendChild(div);
+            });
+        }
+        
+        function 处理学生加载错误(error) {
+            document.getElementById('singleStudent').innerHTML = '<option value="">加载学生失败</option>';
+            document.getElementById('studentList').innerHTML = '加载学生列表失败';
+            console.error('加载学生列表失败:', error);
+        }
+        
+        // 选择模式切换
+        document.querySelectorAll('input[name="selectMode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('singleSelect').style.display = 'none';
+                document.getElementById('multipleSelect').style.display = 'none';
+                document.getElementById('allSelect').style.display = 'none';
+                
+                if (this.value === 'single') {
+                    document.getElementById('singleSelect').style.display = 'block';
+                } else if (this.value === 'multiple') {
+                    document.getElementById('multipleSelect').style.display = 'block';
+                } else if (this.value === 'all') {
+                    document.getElementById('allSelect').style.display = 'block';
+                }
+            });
+        });
+        
+        // 难度等级选择时显示积分
+        document.getElementById('difficulty').addEventListener('change', function() {
+            const pointsMap = {
+                '简单': 10,
+                '中等': 20,
+                '困难': 30,
+                '专家': 50
+            };
+            
+            const points = pointsMap[this.value];
+            const display = document.getElementById('pointsDisplay');
+            const value = document.getElementById('pointsValue');
+            
+            if (points) {
+                value.textContent = points;
+                display.style.display = 'block';
+            } else {
+                display.style.display = 'none';
+            }
+        });
+        
+        function 关闭对话框() {
+            google.script.host.close();
+        }
+        
+        function 显示加载状态() {
+            document.getElementById('loading').style.display = 'flex';
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+        }
+        
+        function 隐藏加载状态() {
+            document.getElementById('loading').style.display = 'none';
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
+        }
+        
+        function 显示成功消息() {
+            document.getElementById('successMessage').style.display = 'block';
+            setTimeout(() => {
+                关闭对话框();
+            }, 2000);
+        }
+        
+        function 显示错误消息(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message || '❌ 布置失败，请检查输入信息';
+            errorDiv.style.display = 'block';
+        }
+        
+        // 表单提交处理
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const selectMode = document.querySelector('input[name="selectMode"]:checked').value;
+            
+            // 获取选中的学生
+            let selectedStudents = [];
+            if (selectMode === 'single') {
+                const studentId = formData.get('singleStudent');
+                if (studentId) selectedStudents = [studentId];
+            } else if (selectMode === 'multiple') {
+                const checkboxes = document.querySelectorAll('#studentList input[type="checkbox"]:checked');
+                selectedStudents = Array.from(checkboxes).map(cb => cb.value);
+            } else if (selectMode === 'all') {
+                selectedStudents = studentsData.map(s => s.id);
+            }
+            
+            // 验证
+            if (!formData.get('taskTitle') || !formData.get('taskDescription') || 
+                !formData.get('taskType') || !formData.get('difficulty') || 
+                !formData.get('dueDate')) {
+                显示错误消息('请填写所有必填字段');
+                return;
+            }
+            
+            if (selectedStudents.length === 0) {
+                显示错误消息('请至少选择一个学生');
+                return;
+            }
+            
+            if (!currentTeacherId) {
+                显示错误消息('无法获取当前教师信息');
+                return;
+            }
+            
+            显示加载状态();
+            
+            // 为每个选中的学生布置任务
+            const promises = selectedStudents.map(studentId => {
+                return new Promise((resolve, reject) => {
+                    google.script.run
+                        .withSuccessHandler(resolve)
+                        .withFailureHandler(reject)
+                        .布置任务(
+                            currentTeacherId,
+                            studentId,
+                            formData.get('taskType'),
+                            formData.get('taskTitle'),
+                            formData.get('taskDescription'),
+                            formData.get('difficulty'),
+                            formData.get('dueDate') // 保持为字符串格式
+                        );
+                });
+            });
+            
+            Promise.all(promises)
+                .then((taskIds) => {
+                    隐藏加载状态();
+                    显示成功消息();
+                    console.log('任务布置成功，任务IDs:', taskIds);
+                })
+                .catch((error) => {
+                    隐藏加载状态();
+                    显示错误消息(error.toString());
+                    console.error('布置任务失败:', error);
+                });
+        });
+    </script>
+</body>
+</html>

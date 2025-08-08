@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加新教师</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #34a853, #4caf50, #8bc34a, #cddc39);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .required {
+            color: #ea4335;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #34a853;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(52, 168, 83, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .specialization-select {
+            position: relative;
+        }
+        
+        .specialization-select::after {
+            content: '🎓';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 16px;
+        }
+        
+        .experience-input {
+            position: relative;
+        }
+        
+        .experience-input::after {
+            content: '年';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
+        }
+        
+        .salary-input {
+            position: relative;
+        }
+        
+        .salary-input::before {
+            content: '¥';
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .salary-input input {
+            padding-left: 30px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #34a853, #4caf50);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(52, 168, 83, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #5f6368;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e8eaed;
+            border-color: #c0c0c0;
+        }
+        
+        .icon {
+            margin-right: 8px;
+        }
+        
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #34a853;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+            color: #137333;
+            font-weight: 500;
+            margin-top: 20px;
+            padding: 12px;
+            background: #e8f5e8;
+            border-radius: 8px;
+        }
+        
+        .error-message {
+            display: none;
+            text-align: center;
+            color: #d93025;
+            font-weight: 500;
+            margin-top: 20px;
+            padding: 12px;
+            background: #fce8e6;
+            border-radius: 8px;
+        }
+        
+        .specialization-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .form-group select + .specialization-info.show {
+            display: block;
+        }
+        
+        .rate-suggestions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .rate-tag {
+            padding: 4px 8px;
+            background: #e8f5e8;
+            color: #34a853;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .rate-tag:hover {
+            background: #34a853;
+            color: white;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👨‍🏫 添加新教师</h1>
+            <p>请填写教师的基本信息</p>
+        </div>
+        
+        <form id="teacherForm">
+            <div class="form-group">
+                <label for="name">姓名 <span class="required">*</span></label>
+                <input type="text" id="name" name="name" required placeholder="请输入教师姓名">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">邮箱 <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="teacher@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">电话</label>
+                    <input type="tel" id="phone" name="phone" placeholder="13800138000">
+                </div>
+            </div>
+            
+            <div class="form-group specialization-select">
+                <label for="specialization">专业领域 <span class="required">*</span></label>
+                <select id="specialization" name="specialization" required>
+                    <option value="">请选择专业领域</option>
+                    <option value="前端开发">🎨 前端开发</option>
+                    <option value="后端开发">⚙️ 后端开发</option>
+                    <option value="全栈开发">🌐 全栈开发</option>
+                    <option value="数据库">🗄️ 数据库</option>
+                    <option value="DevOps">🔧 DevOps</option>
+                    <option value="英语教学">🗣️ 英语教学</option>
+                    <option value="职业规划">💼 职业规划</option>
+                </select>
+                <div class="specialization-info" id="specializationInfo">
+                    专业领域说明将在这里显示
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group experience-input">
+                    <label for="experience">工作经验 <span class="required">*</span></label>
+                    <input type="number" id="experience" name="experience" required min="0" max="30" placeholder="工作年限">
+                </div>
+                
+                <div class="form-group salary-input">
+                    <label for="hourlyRate">时薪</label>
+                    <input type="number" id="hourlyRate" name="hourlyRate" min="50" max="1000" step="10" placeholder="每小时费用">
+                    <div class="rate-suggestions">
+                        <span class="rate-tag" onclick="设置时薪(100)">¥100</span>
+                        <span class="rate-tag" onclick="设置时薪(150)">¥150</span>
+                        <span class="rate-tag" onclick="设置时薪(200)">¥200</span>
+                        <span class="rate-tag" onclick="设置时薪(300)">¥300</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button type="button" class="btn btn-secondary" onclick="关闭对话框()">
+                    <span class="icon">❌</span>取消
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <span class="icon">✅</span>添加教师
+                </button>
+            </div>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            🎉 教师添加成功！
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            ❌ 添加失败，请检查输入信息
+        </div>
+    </div>
+
+    <script>
+        // 专业领域说明
+        const 专业领域说明 = {
+            '前端开发': '负责HTML、CSS、JavaScript、React、Vue等前端技术教学',
+            '后端开发': '负责Node.js、Python、数据库等后端技术教学',
+            '全栈开发': '负责前端和后端全栈技术的综合教学',
+            '数据库': '负责MySQL、MongoDB等数据库技术教学',
+            'DevOps': '负责部署、运维、自动化等DevOps技术教学',
+            '英语教学': '负责英语口语、写作、面试等英语能力提升',
+            '职业规划': '负责简历指导、面试技巧、职业发展规划'
+        };
+        
+        function 关闭对话框() {
+            google.script.host.close();
+        }
+        
+        function 显示加载状态() {
+            document.getElementById('loading').style.display = 'block';
+            document.querySelector('form').style.opacity = '0.5';
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+        }
+        
+        function 隐藏加载状态() {
+            document.getElementById('loading').style.display = 'none';
+            document.querySelector('form').style.opacity = '1';
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
+        }
+        
+        function 显示成功消息() {
+            document.getElementById('successMessage').style.display = 'block';
+            setTimeout(() => {
+                关闭对话框();
+            }, 2000);
+        }
+        
+        function 显示错误消息(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message || '❌ 添加失败，请检查输入信息';
+            errorDiv.style.display = 'block';
+        }
+        
+        function 设置时薪(amount) {
+            document.getElementById('hourlyRate').value = amount;
+            
+            // 更新选中状态
+            document.querySelectorAll('.rate-tag').forEach(tag => tag.style.background = '#e8f5e8');
+            document.querySelectorAll('.rate-tag').forEach(tag => tag.style.color = '#34a853');
+            event.target.style.background = '#34a853';
+            event.target.style.color = 'white';
+        }
+        
+        // 专业领域选择变化时显示说明
+        document.getElementById('specialization').addEventListener('change', function() {
+            const infoDiv = document.getElementById('specializationInfo');
+            const specialization = this.value;
+            
+            if (specialization && 专业领域说明[specialization]) {
+                infoDiv.textContent = 专业领域说明[specialization];
+                infoDiv.classList.add('show');
+            } else {
+                infoDiv.classList.remove('show');
+            }
+        });
+        
+        // 表单提交处理
+        document.getElementById('teacherForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                specialization: formData.get('specialization'),
+                experience: parseInt(formData.get('experience')),
+                hourlyRate: parseFloat(formData.get('hourlyRate')) || 0
+            };
+            
+            // 验证必填字段
+            if (!data.name || !data.email || !data.specialization || !data.experience) {
+                显示错误消息('请填写所有必填字段');
+                return;
+            }
+            
+            // 验证邮箱格式
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(data.email)) {
+                显示错误消息('请输入正确的邮箱格式');
+                return;
+            }
+            
+            // 验证工作经验
+            if (data.experience < 0 || data.experience > 30) {
+                显示错误消息('工作经验应在0-30年之间');
+                return;
+            }
+            
+            显示加载状态();
+            
+            // 调用后端函数
+            google.script.run
+                .withSuccessHandler(function(teacherId) {
+                    隐藏加载状态();
+                    显示成功消息();
+                    console.log('教师添加成功，ID:', teacherId);
+                })
+                .withFailureHandler(function(error) {
+                    隐藏加载状态();
+                    显示错误消息(error.toString());
+                    console.error('添加教师失败:', error);
+                })
+                .添加新教师(data.name, data.email, data.phone, data.specialization, data.experience, data.hourlyRate);
+        });
+        
+        // 输入验证
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = '#ea4335';
+                this.style.backgroundColor = '#fce8e6';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+                this.style.backgroundColor = '#fafafa';
+            }
+        });
+        
+        document.getElementById('phone').addEventListener('input', function() {
+            // 只允许数字和基本符号
+            this.value = this.value.replace(/[^0-9+\-\s()]/g, '');
+        });
+        
+        document.getElementById('experience').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 0) this.value = 0;
+            if (value > 30) this.value = 30;
+        });
+        
+        document.getElementById('hourlyRate').addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            if (value < 0) this.value = 0;
+            if (value > 1000) this.value = 1000;
+        });
+    </script>
+</body>
+</html>

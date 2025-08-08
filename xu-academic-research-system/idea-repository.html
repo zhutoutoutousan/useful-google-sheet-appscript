@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ideas Repository - Cyberpunk Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Neural network background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(138, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(0, 255, 65, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #8000ff;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 20px rgba(128, 0, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(128, 0, 255, 0.1) 0%, 
+                rgba(255, 0, 128, 0.1) 50%, 
+                rgba(128, 0, 255, 0.1) 100%);
+            animation: idea-pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes idea-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #8000ff, 0 0 20px #8000ff, 0 0 30px #8000ff;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #ff0080;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #8000ff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .ideas-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #8000ff;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(128, 0, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(128, 0, 255, 0.1) 50%, transparent 51%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(128, 0, 255, 0.4);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #8000ff;
+            text-shadow: 0 0 5px #8000ff;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select, .search-input {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #8000ff;
+            border-radius: 5px;
+            color: #8000ff;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .search-input::placeholder {
+            color: rgba(128, 0, 255, 0.5);
+        }
+        
+        .filter-select:focus, .search-input:focus {
+            outline: none;
+            border-color: #ff0080;
+            box-shadow: 0 0 10px rgba(255, 0, 128, 0.3);
+        }
+        
+        .ideas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .idea-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #8000ff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(128, 0, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .idea-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(128, 0, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .idea-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(128, 0, 255, 0.4);
+            border-color: #ff0080;
+        }
+        
+        .idea-card:hover::before {
+            left: 100%;
+        }
+        
+        .idea-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .idea-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff0080;
+            text-shadow: 0 0 5px #ff0080;
+            margin-bottom: 5px;
+        }
+        
+        .idea-votes {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .vote-score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ff41;
+            text-shadow: 0 0 3px #00ff41;
+        }
+        
+        .vote-btn {
+            background: none;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 3px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .vote-btn:hover {
+            background: #00ff41;
+            color: #000;
+        }
+        
+        .idea-submitter {
+            font-size: 0.9rem;
+            color: #00ffff;
+            margin-bottom: 10px;
+        }
+        
+        .idea-category {
+            font-size: 0.8rem;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .category-ai { background: #8000ff; color: #fff; }
+        .category-blockchain { background: #ff0080; color: #fff; }
+        .category-iot { background: #00ff41; color: #000; }
+        .category-quantum { background: #00ffff; color: #000; }
+        .category-biotech { background: #ff8000; color: #000; }
+        .category-other { background: #666; color: #fff; }
+        
+        .idea-status {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            float: right;
+        }
+        
+        .status-approved { background: #00ff41; color: #000; }
+        .status-under-review { background: #0080ff; color: #fff; }
+        .status-rejected { background: #ff0080; color: #fff; }
+        .status-implemented { background: #8000ff; color: #fff; }
+        
+        .idea-abstract {
+            font-size: 0.9rem;
+            color: #cccccc;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+        
+        .idea-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: #ff0080;
+            font-weight: bold;
+        }
+        
+        .detail-value {
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+        
+        .keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .keyword-tag {
+            background: rgba(255, 0, 128, 0.2);
+            border: 1px solid #ff0080;
+            color: #ff0080;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #8000ff, #ff0080);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(128, 0, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💡 IDEAS REPOSITORY</h1>
+            <p>Innovation hub for breakthrough concepts</p>
+        </div>
+        
+        <div id="loading" class="loading">
+            Mining brilliant ideas...
+        </div>
+        
+        <div id="ideasContent" style="display: none;">
+            <div class="ideas-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalIdeas">0</div>
+                    <div class="stat-label">Total Ideas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="approvedIdeas">0</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="implementedIdeas">0</div>
+                    <div class="stat-label">Implemented</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgVotes">0</div>
+                    <div class="stat-label">Avg Votes</div>
+                </div>
+            </div>
+            
+            <div class="filters">
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search ideas by title, abstract, or keywords...">
+                <select id="categoryFilter" class="filter-select">
+                    <option value="">All Categories</option>
+                </select>
+                <select id="statusFilter" class="filter-select">
+                    <option value="">All Status</option>
+                    <option value="Under Review">Under Review</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Implemented">Implemented</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+                <select id="sortFilter" class="filter-select">
+                    <option value="newest">Newest First</option>
+                    <option value="votes">Most Voted</option>
+                    <option value="oldest">Oldest First</option>
+                </select>
+            </div>
+            
+            <div id="ideasGrid" class="ideas-grid">
+                <!-- Ideas will be populated here -->
+            </div>
+        </div>
+        
+        <div id="noData" class="no-data" style="display: none;">
+            <h3>🤖 No ideas found</h3>
+            <p>Be the first to submit a groundbreaking idea!</p>
+            <button class="refresh-btn" onclick="loadIdeasRepository()">Refresh Data</button>
+        </div>
+        
+        <button class="refresh-btn" onclick="loadIdeasRepository()">🔄 Refresh Repository</button>
+    </div>
+    
+    <script>
+        let allIdeas = [];
+        let ideasRepositoryData = <?= JSON.stringify(ideasRepositoryData) ?>;
+        
+        // Load ideas repository data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[IDEA-REPOSITORY] 🌟 Page loaded, starting initialization');
+            loadIdeasRepository();
+            setupFilters();
+        });
+        
+        function setupFilters() {
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            const filters = ['categoryFilter', 'statusFilter', 'sortFilter'];
+            filters.forEach(filterId => {
+                document.getElementById(filterId).addEventListener('change', applyFilters);
+            });
+        }
+        
+        function loadIdeasRepository() {
+            console.log('[IDEA-REPOSITORY] 🚀 Starting loadIdeasRepository()');
+            console.log('[IDEA-REPOSITORY] 📊 Using pre-loaded data from template');
+            console.log('[IDEA-REPOSITORY] 📊 Template data:', ideasRepositoryData);
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('ideasContent').style.display = 'none';
+            document.getElementById('noData').style.display = 'none';
+            
+            // Use pre-loaded data instead of google.script.run
+            if (typeof ideasRepositoryData === 'string') {
+                ideasRepositoryData = JSON.parse(ideasRepositoryData);
+            }
+            
+            console.log('[IDEA-REPOSITORY] ✅ Received data from backend:', ideasRepositoryData);
+            console.log('[IDEA-REPOSITORY] 📊 Data type:', typeof ideasRepositoryData);
+            console.log('[IDEA-REPOSITORY] 📊 Data structure:', ideasRepositoryData);
+            
+            displayIdeasRepository(ideasRepositoryData);
+        }
+        
+        function displayIdeasRepository(data) {
+            console.log('[IDEA-REPOSITORY] 🎯 displayIdeasRepository called with:', data);
+            document.getElementById('loading').style.display = 'none';
+            
+            if (!data) {
+                console.log('[IDEA-REPOSITORY] ❌ No data received');
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+            
+            if (!data.ideas || data.ideas.length === 0) {
+                console.log('[IDEA-REPOSITORY] ❌ No ideas in data');
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+            
+            console.log('[IDEA-REPOSITORY] ✅ Displaying', data.ideas.length, 'ideas');
+            allIdeas = data.ideas;
+            
+            // Update stats
+            document.getElementById('totalIdeas').textContent = data.stats.total;
+            document.getElementById('approvedIdeas').textContent = data.stats.approved;
+            document.getElementById('implementedIdeas').textContent = data.stats.implemented;
+            document.getElementById('avgVotes').textContent = data.stats.avgVotes.toFixed(1);
+            
+            // Populate category filter
+            populateCategoryFilter(data.categories);
+            
+            // Display all ideas
+            displayIdeaCards(allIdeas);
+            
+            document.getElementById('ideasContent').style.display = 'block';
+        }
+        
+        function populateCategoryFilter(categories) {
+            const categoryFilter = document.getElementById('categoryFilter');
+            categoryFilter.innerHTML = '<option value="">All Categories</option>';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+        }
+        
+        function displayIdeaCards(ideas) {
+            const ideasGrid = document.getElementById('ideasGrid');
+            ideasGrid.innerHTML = '';
+            
+            ideas.forEach((idea, index) => {
+                const ideaCard = createIdeaCard(idea);
+                ideasGrid.appendChild(ideaCard);
+                
+                // Animate card appearance
+                setTimeout(() => {
+                    ideaCard.style.opacity = '0';
+                    ideaCard.style.transform = 'translateY(20px)';
+                    ideaCard.style.transition = 'all 0.5s ease';
+                    setTimeout(() => {
+                        ideaCard.style.opacity = '1';
+                        ideaCard.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        }
+        
+        function createIdeaCard(idea) {
+            const card = document.createElement('div');
+            card.className = 'idea-card';
+            
+            const categoryClass = idea.category.toLowerCase().replace(/\s+/g, '-');
+            const statusClass = idea.status.toLowerCase().replace(/\s+/g, '-');
+            const keywords = idea.keywords.split(',').map(k => k.trim()).filter(k => k);
+            const submitDate = new Date(idea.submitDate).toLocaleDateString();
+            
+            card.innerHTML = `
+                <div class="idea-header">
+                    <div>
+                        <div class="idea-title">${idea.title}</div>
+                        <div class="idea-submitter">👤 ${idea.submitterName}</div>
+                        <div class="idea-category category-${categoryClass}">${idea.category}</div>
+                    </div>
+                    <div>
+                        <div class="idea-status status-${statusClass}">${idea.status}</div>
+                        <div class="idea-votes">
+                            <button class="vote-btn" onclick="voteIdea('${idea.id}', 1)">+</button>
+                            <span class="vote-score">${idea.voteScore}</span>
+                            <button class="vote-btn" onclick="voteIdea('${idea.id}', -1)">-</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="idea-abstract">
+                    ${idea.abstract}
+                </div>
+                
+                <div class="idea-details">
+                    <div class="detail-item">
+                        <span class="detail-label">📅 Submitted:</span>
+                        <span class="detail-value">${submitDate}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">🎯 Impact:</span>
+                        <span class="detail-value">${idea.potentialImpact}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">💰 Resources:</span>
+                        <span class="detail-value">${idea.resourcesNeeded}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">👀 Reviewer:</span>
+                        <span class="detail-value">${idea.reviewerComments || 'Pending review'}</span>
+                    </div>
+                </div>
+                
+                ${keywords.length > 0 ? `
+                <div class="keywords">
+                    ${keywords.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
+                </div>
+                ` : ''}
+            `;
+            
+            return card;
+        }
+        
+        function voteIdea(ideaId, vote) {
+            // This would typically call a backend function to record the vote
+            google.script.run
+                .withSuccessHandler(() => {
+                    // Refresh the display
+                    loadIdeasRepository();
+                })
+                .voteOnIdea(ideaId, vote);
+        }
+        
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            let filtered = allIdeas;
+            
+            // Apply search filter
+            if (searchTerm) {
+                filtered = filtered.filter(idea => 
+                    idea.title.toLowerCase().includes(searchTerm) ||
+                    idea.abstract.toLowerCase().includes(searchTerm) ||
+                    idea.keywords.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Apply category filter
+            if (categoryFilter) {
+                filtered = filtered.filter(idea => idea.category === categoryFilter);
+            }
+            
+            // Apply status filter
+            if (statusFilter) {
+                filtered = filtered.filter(idea => idea.status === statusFilter);
+            }
+            
+            // Apply sorting
+            filtered.sort((a, b) => {
+                switch (sortFilter) {
+                    case 'votes':
+                        return b.voteScore - a.voteScore;
+                    case 'oldest':
+                        return new Date(a.submitDate) - new Date(b.submitDate);
+                    case 'newest':
+                    default:
+                        return new Date(b.submitDate) - new Date(a.submitDate);
+                }
+            });
+            
+            displayIdeaCards(filtered);
+        }
+        
+        function handleError(error) {
+            console.log('[IDEA-REPOSITORY] ❌ Error occurred:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+            console.error('Error loading ideas repository:', error);
+        }
+    </script>
+</body>
+</html>

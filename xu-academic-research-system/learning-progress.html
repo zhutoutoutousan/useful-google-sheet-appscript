@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Learning Progress - Cyberpunk Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Animated circuit background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 65, 0.03) 2px,
+                    rgba(0, 255, 65, 0.03) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 255, 255, 0.03) 2px,
+                    rgba(0, 255, 255, 0.03) 4px
+                );
+            animation: circuit-flow 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes circuit-flow {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 20px); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #ff0080;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 20px rgba(255, 0, 128, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 128, 0.2), transparent);
+            animation: progress-scan 3s ease-in-out infinite;
+        }
+        
+        @keyframes progress-scan {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #ff0080, 0 0 20px #ff0080, 0 0 30px #ff0080;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #00ffff;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ff0080;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(0, 255, 65, 0.1) 50%, transparent 51%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff0080;
+            text-shadow: 0 0 5px #ff0080;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            color: #00ff41;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .activities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        
+        .activity-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .activity-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.4);
+            border-color: #00ffff;
+        }
+        
+        .activity-card:hover::before {
+            left: 100%;
+        }
+        
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .activity-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            margin-bottom: 5px;
+        }
+        
+        .activity-type {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .type-video { background: #ff0080; color: #fff; }
+        .type-course { background: #0080ff; color: #fff; }
+        .type-book { background: #00ff41; color: #000; }
+        .type-paper { background: #8000ff; color: #fff; }
+        .type-conference { background: #ff8000; color: #000; }
+        .type-workshop { background: #00ffff; color: #000; }
+        .type-other { background: #666; color: #fff; }
+        
+        .activity-member {
+            font-size: 0.9rem;
+            color: #ff0080;
+            margin-bottom: 10px;
+        }
+        
+        .progress-section {
+            margin: 15px 0;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .progress-label {
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+        
+        .progress-percentage {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #00ff41;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progress-shimmer 2s infinite;
+        }
+        
+        @keyframes progress-shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .progress-0-25 { background: #ff0080; }
+        .progress-25-50 { background: #ff8000; }
+        .progress-50-75 { background: #0080ff; }
+        .progress-75-90 { background: #00ffff; }
+        .progress-90-100 { background: #00ff41; }
+        
+        .activity-details {
+            font-size: 0.9rem;
+            color: #cccccc;
+            line-height: 1.4;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .detail-label {
+            color: #ff0080;
+            font-weight: bold;
+        }
+        
+        .rating-stars {
+            color: #ff8000;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #ff0080, #00ffff);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 LEARNING PROGRESS</h1>
+            <p>Knowledge acquisition tracking system</p>
+            <div class="user-info" style="margin-top: 10px; font-size: 0.9rem; color: #00ffff;">
+                <span id="currentUserInfo">Loading user info...</span>
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            Analyzing learning data...
+        </div>
+        
+        <div id="progressContent" style="display: none;">
+            <div class="progress-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalActivities">0</div>
+                    <div class="stat-label">Total Activities</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="completedActivities">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgProgress">0%</div>
+                    <div class="stat-label">Avg Progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalHours">0</div>
+                    <div class="stat-label">Total Hours</div>
+                </div>
+            </div>
+            
+            <div class="filters">
+                <select id="memberFilter" class="filter-select">
+                    <option value="">All Members</option>
+                </select>
+                <select id="typeFilter" class="filter-select">
+                    <option value="">All Types</option>
+                </select>
+                <select id="progressFilter" class="filter-select">
+                    <option value="">All Progress</option>
+                    <option value="0-25">0-25%</option>
+                    <option value="25-50">25-50%</option>
+                    <option value="50-75">50-75%</option>
+                    <option value="75-100">75-100%</option>
+                    <option value="100">Completed</option>
+                </select>
+            </div>
+            
+            <div id="activitiesGrid" class="activities-grid">
+                <!-- Activities will be populated here -->
+            </div>
+        </div>
+        
+        <div id="noData" class="no-data" style="display: none;">
+            <h3>🤖 No learning activities found</h3>
+            <p>Start tracking learning progress by logging activities!</p>
+            <button class="refresh-btn" onclick="loadLearningProgress()">Refresh Data</button>
+        </div>
+        
+        <button class="refresh-btn" onclick="loadLearningProgress()">🔄 Refresh Progress</button>
+    </div>
+    
+    <script>
+        let allActivities = [];
+        
+        // Load learning progress data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLearningProgress();
+            setupFilters();
+        });
+        
+        function setupFilters() {
+            const filters = ['memberFilter', 'typeFilter', 'progressFilter'];
+            filters.forEach(filterId => {
+                document.getElementById(filterId).addEventListener('change', applyFilters);
+            });
+        }
+        
+        function loadLearningProgress() {
+            console.log('[LEARNING-PROGRESS] 🚀 Starting loadLearningProgress()');
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('progressContent').style.display = 'none';
+            document.getElementById('noData').style.display = 'none';
+            
+            // Use pre-loaded data instead of async call
+            console.log('[LEARNING-PROGRESS] 📊 Using pre-loaded data from template');
+            
+            // Get current user info
+            const currentUserEmailRaw = <?= JSON.stringify(currentUserEmail) ?>;
+            const currentMemberRaw = <?= JSON.stringify(currentMember) ?>;
+            const allMembersRaw = <?= JSON.stringify(allMembers) ?>;
+            const learningProgressDataRaw = <?= JSON.stringify(learningProgressData) ?>;
+            
+            // Parse data if needed
+            let currentUserEmail, currentMember, allMembers, learningProgressData;
+            
+            if (typeof currentUserEmailRaw === 'string') {
+                currentUserEmail = JSON.parse(currentUserEmailRaw);
+                currentMember = JSON.parse(currentMemberRaw);
+                allMembers = JSON.parse(allMembersRaw);
+                learningProgressData = JSON.parse(learningProgressDataRaw);
+            } else {
+                currentUserEmail = currentUserEmailRaw;
+                currentMember = currentMemberRaw;
+                allMembers = allMembersRaw;
+                learningProgressData = learningProgressDataRaw;
+            }
+            
+            console.log('[LEARNING-PROGRESS] 👤 Current user:', currentUserEmail);
+            console.log('[LEARNING-PROGRESS] 👤 Current member:', currentMember);
+            console.log('[LEARNING-PROGRESS] 👥 All members:', allMembers.length);
+            console.log('[LEARNING-PROGRESS] 📊 Progress data for', Object.keys(learningProgressData).length, 'members');
+            
+            // Store globally for other functions
+            window.currentUserEmail = currentUserEmail;
+            window.currentMember = currentMember;
+            window.allMembers = allMembers;
+            window.learningProgressData = learningProgressData;
+            
+            // Update user info display
+            if (currentMember) {
+                document.getElementById('currentUserInfo').innerHTML = 
+                    `🎯 Logged in as: <strong>${currentMember.name}</strong> (${currentMember.role})`;
+            } else {
+                document.getElementById('currentUserInfo').innerHTML = 
+                    `📧 Logged in as: <strong>${currentUserEmail}</strong> (not found in members list)`;
+            }
+            
+            // Populate member filter
+            populateMemberFilter();
+            
+            // Show current user's data by default, or all data if user not found
+            const defaultMemberId = currentMember ? currentMember.id : '';
+            displayLearningProgressForMember(defaultMemberId);
+        }
+        
+        function populateMemberFilter() {
+            const memberFilter = document.getElementById('memberFilter');
+            memberFilter.innerHTML = '<option value="">All Members</option>';
+            
+            if (window.allMembers) {
+                window.allMembers.forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = member.id;
+                    option.textContent = `${member.name} (${member.role})`;
+                    if (window.currentMember && member.id === window.currentMember.id) {
+                        option.textContent += ' 🎯';
+                        option.selected = true;
+                    }
+                    memberFilter.appendChild(option);
+                });
+            }
+            
+            // Add event listener for member selection
+            memberFilter.addEventListener('change', function() {
+                displayLearningProgressForMember(this.value);
+            });
+        }
+        
+        function displayLearningProgressForMember(memberId) {
+            console.log('[LEARNING-PROGRESS] 📊 Displaying progress for member:', memberId);
+            
+            let data;
+            if (memberId && window.learningProgressData[memberId]) {
+                data = window.learningProgressData[memberId];
+                console.log('[LEARNING-PROGRESS] 📊 Found specific member data:', data);
+            } else {
+                // Aggregate all data
+                const allActivities = [];
+                let totalStats = { total: 0, completed: 0, avgProgress: 0, totalHours: 0 };
+                
+                if (window.learningProgressData) {
+                    Object.values(window.learningProgressData).forEach(memberData => {
+                        if (memberData && memberData.activities) {
+                            allActivities.push(...memberData.activities);
+                            totalStats.total += memberData.stats.total;
+                            totalStats.completed += memberData.stats.completed;
+                            totalStats.totalHours += memberData.stats.totalHours;
+                        }
+                    });
+                    
+                    totalStats.avgProgress = totalStats.total > 0 ? 
+                        allActivities.reduce((sum, activity) => sum + activity.progress, 0) / allActivities.length : 0;
+                    totalStats.avgProgress = Math.round(totalStats.avgProgress * 10) / 10;
+                }
+                
+                data = {
+                    activities: allActivities,
+                    stats: totalStats,
+                    error: null
+                };
+                console.log('[LEARNING-PROGRESS] 📊 Aggregated all member data:', data);
+            }
+            
+            displayLearningProgress(data);
+        }
+        
+        function displayLearningProgress(data) {
+            document.getElementById('loading').style.display = 'none';
+            
+            if (!data || data.activities.length === 0) {
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+            
+            allActivities = data.activities;
+            
+            // Update stats
+            document.getElementById('totalActivities').textContent = data.stats.total;
+            document.getElementById('completedActivities').textContent = data.stats.completed;
+            document.getElementById('avgProgress').textContent = data.stats.avgProgress + '%';
+            document.getElementById('totalHours').textContent = data.stats.totalHours;
+            
+            // Populate filter options
+            populateFilters(data.filters);
+            
+            // Display all activities
+            displayActivityCards(allActivities);
+            
+            document.getElementById('progressContent').style.display = 'block';
+        }
+        
+        function populateFilters(filters) {
+            // Populate member filter
+            const memberFilter = document.getElementById('memberFilter');
+            memberFilter.innerHTML = '<option value="">All Members</option>';
+            filters.members.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member;
+                option.textContent = member;
+                memberFilter.appendChild(option);
+            });
+            
+            // Populate type filter
+            const typeFilter = document.getElementById('typeFilter');
+            typeFilter.innerHTML = '<option value="">All Types</option>';
+            filters.types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                typeFilter.appendChild(option);
+            });
+        }
+        
+        function displayActivityCards(activities) {
+            const activitiesGrid = document.getElementById('activitiesGrid');
+            activitiesGrid.innerHTML = '';
+            
+            activities.forEach((activity, index) => {
+                const activityCard = createActivityCard(activity);
+                activitiesGrid.appendChild(activityCard);
+                
+                // Animate card appearance
+                setTimeout(() => {
+                    activityCard.style.opacity = '0';
+                    activityCard.style.transform = 'translateY(20px)';
+                    activityCard.style.transition = 'all 0.5s ease';
+                    setTimeout(() => {
+                        activityCard.style.opacity = '1';
+                        activityCard.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        }
+        
+        function createActivityCard(activity) {
+            const card = document.createElement('div');
+            card.className = 'activity-card';
+            
+            const typeClass = activity.type.toLowerCase().replace(/\s+/g, '-');
+            const progressClass = getProgressClass(activity.progress);
+            const stars = '★'.repeat(Math.floor(activity.rating || 0)) + '☆'.repeat(5 - Math.floor(activity.rating || 0));
+            
+            card.innerHTML = `
+                <div class="activity-header">
+                    <div>
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-member">👤 ${activity.memberName}</div>
+                    </div>
+                    <div class="activity-type type-${typeClass}">${activity.type}</div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span class="progress-label">Progress</span>
+                        <span class="progress-percentage">${activity.progress}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${progressClass}" style="width: ${activity.progress}%"></div>
+                    </div>
+                </div>
+                
+                <div class="activity-details">
+                    <div class="detail-row">
+                        <span class="detail-label">📅 Started:</span>
+                        <span>${new Date(activity.startDate).toLocaleDateString()}</span>
+                    </div>
+                    ${activity.completionDate ? `
+                    <div class="detail-row">
+                        <span class="detail-label">✅ Completed:</span>
+                        <span>${new Date(activity.completionDate).toLocaleDateString()}</span>
+                    </div>
+                    ` : ''}
+                    <div class="detail-row">
+                        <span class="detail-label">⏱️ Duration:</span>
+                        <span>${activity.duration} hours</span>
+                    </div>
+                    ${activity.rating ? `
+                    <div class="detail-row">
+                        <span class="detail-label">⭐ Rating:</span>
+                        <span class="rating-stars">${stars}</span>
+                    </div>
+                    ` : ''}
+                    ${activity.source ? `
+                    <div class="detail-row">
+                        <span class="detail-label">🔗 Source:</span>
+                        <span style="word-break: break-all;">${activity.source}</span>
+                    </div>
+                    ` : ''}
+                    ${activity.notes ? `
+                    <div style="margin-top: 10px;">
+                        <span class="detail-label">📝 Notes:</span><br>
+                        <span style="font-style: italic;">${activity.notes}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function getProgressClass(progress) {
+            if (progress >= 90) return 'progress-90-100';
+            if (progress >= 75) return 'progress-75-90';
+            if (progress >= 50) return 'progress-50-75';
+            if (progress >= 25) return 'progress-25-50';
+            return 'progress-0-25';
+        }
+        
+        function applyFilters() {
+            const memberFilter = document.getElementById('memberFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const progressFilter = document.getElementById('progressFilter').value;
+            
+            let filtered = allActivities;
+            
+            if (memberFilter) {
+                filtered = filtered.filter(activity => activity.memberName === memberFilter);
+            }
+            
+            if (typeFilter) {
+                filtered = filtered.filter(activity => activity.type === typeFilter);
+            }
+            
+            if (progressFilter) {
+                if (progressFilter === '100') {
+                    filtered = filtered.filter(activity => activity.progress === 100);
+                } else {
+                    const [min, max] = progressFilter.split('-').map(Number);
+                    filtered = filtered.filter(activity => 
+                        activity.progress >= min && activity.progress < max
+                    );
+                }
+            }
+            
+            displayActivityCards(filtered);
+        }
+        
+        function handleError(error) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+            console.error('Error loading learning progress:', error);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Learning Analytics - Cyberpunk Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Data stream background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(0, 255, 65, 0.02) 8px,
+                    rgba(0, 255, 65, 0.02) 16px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(0, 255, 255, 0.02) 8px,
+                    rgba(0, 255, 255, 0.02) 16px
+                );
+            animation: data-flow 15s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes data-flow {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(16px, 16px); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #ff0080;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 30px rgba(255, 0, 128, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255, 0, 128, 0.1) 0%, 
+                rgba(0, 255, 65, 0.1) 25%,
+                rgba(0, 255, 255, 0.1) 50%,
+                rgba(128, 0, 255, 0.1) 75%,
+                rgba(255, 0, 128, 0.1) 100%);
+            animation: analytics-pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes analytics-pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #ff0080, 0 0 20px #ff0080, 0 0 30px #ff0080;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #00ffff;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ff0080;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .analytics-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.4);
+        }
+        
+        .analytics-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .analytics-card:hover::before {
+            left: 100%;
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            color: #00ffff;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 0 0 5px #00ffff;
+        }
+        
+        .metric-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .metric-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff0080;
+            text-shadow: 0 0 10px #ff0080;
+            line-height: 1;
+        }
+        
+        .metric-label {
+            font-size: 1rem;
+            color: #cccccc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+        
+        .metric-change {
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        .metric-up {
+            color: #00ff41;
+        }
+        
+        .metric-down {
+            color: #ff0080;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bar-chart {
+            display: flex;
+            align-items: end;
+            height: 100%;
+            padding: 20px;
+            gap: 5px;
+        }
+        
+        .bar {
+            flex: 1;
+            background: linear-gradient(to top, #ff0080, #00ffff);
+            border-radius: 3px 3px 0 0;
+            min-height: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .bar:hover {
+            filter: brightness(1.2);
+            transform: scaleY(1.05);
+        }
+        
+        .bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: bar-shimmer 2s infinite;
+        }
+        
+        @keyframes bar-shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .pie-chart {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto;
+            position: relative;
+            background: conic-gradient(
+                #00ff41 0deg 72deg,
+                #00ffff 72deg 144deg,
+                #ff0080 144deg 216deg,
+                #8000ff 216deg 288deg,
+                #ff8000 288deg 360deg
+            );
+            animation: pie-rotate 20s linear infinite;
+        }
+        
+        @keyframes pie-rotate {
+            to { transform: rotate(360deg); }
+        }
+        
+        .pie-chart::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 60%;
+            background: #0a0a0a;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .trend-line {
+            height: 100%;
+            position: relative;
+            background: linear-gradient(
+                45deg,
+                rgba(0, 255, 65, 0.1) 0%,
+                rgba(0, 255, 255, 0.1) 50%,
+                rgba(255, 0, 128, 0.1) 100%
+            );
+        }
+        
+        .trend-path {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00ff41, #00ffff, #ff0080);
+            clip-path: polygon(0% 50%, 20% 30%, 40% 60%, 60% 20%, 80% 70%, 100% 40%);
+            animation: trend-flow 3s ease-in-out infinite;
+        }
+        
+        @keyframes trend-flow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .insight-panel {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #8000ff;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(128, 0, 255, 0.2);
+        }
+        
+        .insight-title {
+            font-size: 1.3rem;
+            color: #8000ff;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #8000ff;
+        }
+        
+        .insight-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .insight-item {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(128, 0, 255, 0.2);
+            color: #cccccc;
+            line-height: 1.5;
+        }
+        
+        .insight-item:last-child {
+            border-bottom: none;
+        }
+        
+        .insight-item::before {
+            content: '▶ ';
+            color: #8000ff;
+            font-weight: bold;
+        }
+        
+        .filters-panel {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-label {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .filter-select {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            color: #00ff41;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .refresh-btn {
+            background: linear-gradient(45deg, #ff0080, #8000ff);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: auto;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.5);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #cccccc;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 LEARNING ANALYTICS</h1>
+            <p>Advanced intelligence and performance metrics</p>
+        </div>
+        
+        <div class="filters-panel">
+            <span class="filter-label">📅 Time Period:</span>
+            <select id="periodFilter" class="filter-select">
+                <option value="7">Last 7 Days</option>
+                <option value="30" selected>Last 30 Days</option>
+                <option value="90">Last 3 Months</option>
+                <option value="365">Last Year</option>
+                <option value="all">All Time</option>
+            </select>
+            
+            <span class="filter-label">👥 Department:</span>
+            <select id="departmentFilter" class="filter-select">
+                <option value="">All Departments</option>
+            </select>
+            
+            <span class="filter-label">📚 Activity Type:</span>
+            <select id="typeFilter" class="filter-select">
+                <option value="">All Types</option>
+            </select>
+            
+            <button class="refresh-btn" onclick="refreshAnalytics()">🔄 Refresh</button>
+        </div>
+        
+        <div id="loading" class="loading">
+            Processing analytics data...
+        </div>
+        
+        <div id="analyticsContent" style="display: none;">
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <div class="card-title">🎯 Total Learning Hours</div>
+                    <div class="metric-display">
+                        <div class="metric-number" id="totalHours">0</div>
+                        <div class="metric-label">Hours</div>
+                        <div class="metric-change" id="hoursChange">--</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="trend-line">
+                            <div class="trend-path"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <div class="card-title">📈 Completion Rate</div>
+                    <div class="metric-display">
+                        <div class="metric-number" id="completionRate">0%</div>
+                        <div class="metric-label">Average</div>
+                        <div class="metric-change" id="completionChange">--</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="pie-chart"></div>
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <div class="card-title">🚀 Active Learners</div>
+                    <div class="metric-display">
+                        <div class="metric-number" id="activeLearners">0</div>
+                        <div class="metric-label">Members</div>
+                        <div class="metric-change" id="learnersChange">--</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="bar-chart" id="learnersChart">
+                            <!-- Bars will be generated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <div class="card-title">⭐ Average Rating</div>
+                    <div class="metric-display">
+                        <div class="metric-number" id="avgRating">0.0</div>
+                        <div class="metric-label">Stars</div>
+                        <div class="metric-change" id="ratingChange">--</div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="bar-chart" id="ratingChart">
+                            <!-- Rating distribution bars -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <div class="card-title">📚 Learning Types</div>
+                    <div class="chart-container">
+                        <div class="bar-chart" id="typesChart">
+                            <!-- Type distribution bars -->
+                        </div>
+                    </div>
+                    <div class="legend" id="typesLegend">
+                        <!-- Legend will be generated -->
+                    </div>
+                </div>
+                
+                <div class="analytics-card">
+                    <div class="card-title">📅 Weekly Progress</div>
+                    <div class="chart-container">
+                        <div class="bar-chart" id="weeklyChart">
+                            <!-- Weekly progress bars -->
+                        </div>
+                    </div>
+                    <div class="legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #ff0080;"></div>
+                            <span>Hours Logged</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #00ffff;"></div>
+                            <span>Activities Completed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="insight-panel">
+                <div class="insight-title">🧠 AI-Powered Insights</div>
+                <ul class="insight-list" id="insightsList">
+                    <!-- Insights will be generated here -->
+                </ul>
+            </div>
+        </div>
+        
+        <div id="noData" class="no-data" style="display: none;">
+            <h3>🤖 No analytics data available</h3>
+            <p>Start logging learning activities to see analytics!</p>
+        </div>
+    </div>
+    
+    <script>
+        // Load analytics data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAnalytics();
+            setupFilters();
+        });
+        
+        function setupFilters() {
+            const filters = ['periodFilter', 'departmentFilter', 'typeFilter'];
+            filters.forEach(filterId => {
+                document.getElementById(filterId).addEventListener('change', loadAnalytics);
+            });
+        }
+        
+        function loadAnalytics() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('analyticsContent').style.display = 'none';
+            document.getElementById('noData').style.display = 'none';
+            
+            const filters = {
+                period: document.getElementById('periodFilter').value,
+                department: document.getElementById('departmentFilter').value,
+                type: document.getElementById('typeFilter').value
+            };
+            
+            google.script.run
+                .withSuccessHandler(displayAnalytics)
+                .withFailureHandler(handleError)
+                .getLearningAnalyticsData(filters);
+        }
+        
+        function displayAnalytics(data) {
+            document.getElementById('loading').style.display = 'none';
+            
+            if (!data || data.totalActivities === 0) {
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+            
+            // Update main metrics
+            updateMetrics(data.metrics);
+            
+            // Populate filter options
+            populateFilters(data.filters);
+            
+            // Generate charts
+            generateCharts(data.charts);
+            
+            // Generate insights
+            generateInsights(data.insights);
+            
+            document.getElementById('analyticsContent').style.display = 'block';
+        }
+        
+        function updateMetrics(metrics) {
+            document.getElementById('totalHours').textContent = metrics.totalHours.toFixed(1);
+            document.getElementById('completionRate').textContent = metrics.completionRate.toFixed(1) + '%';
+            document.getElementById('activeLearners').textContent = metrics.activeLearners;
+            document.getElementById('avgRating').textContent = metrics.avgRating.toFixed(1);
+            
+            // Update change indicators
+            updateChangeIndicator('hoursChange', metrics.hoursChange);
+            updateChangeIndicator('completionChange', metrics.completionChange);
+            updateChangeIndicator('learnersChange', metrics.learnersChange);
+            updateChangeIndicator('ratingChange', metrics.ratingChange);
+        }
+        
+        function updateChangeIndicator(elementId, change) {
+            const element = document.getElementById(elementId);
+            if (change > 0) {
+                element.textContent = `↗ +${change.toFixed(1)}%`;
+                element.className = 'metric-change metric-up';
+            } else if (change < 0) {
+                element.textContent = `↘ ${change.toFixed(1)}%`;
+                element.className = 'metric-change metric-down';
+            } else {
+                element.textContent = '→ No change';
+                element.className = 'metric-change';
+            }
+        }
+        
+        function populateFilters(filters) {
+            // Populate department filter
+            const deptFilter = document.getElementById('departmentFilter');
+            const currentDept = deptFilter.value;
+            deptFilter.innerHTML = '<option value="">All Departments</option>';
+            filters.departments.forEach(dept => {
+                const option = document.createElement('option');
+                option.value = dept;
+                option.textContent = dept;
+                if (dept === currentDept) option.selected = true;
+                deptFilter.appendChild(option);
+            });
+            
+            // Populate type filter
+            const typeFilter = document.getElementById('typeFilter');
+            const currentType = typeFilter.value;
+            typeFilter.innerHTML = '<option value="">All Types</option>';
+            filters.types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                if (type === currentType) option.selected = true;
+                typeFilter.appendChild(option);
+            });
+        }
+        
+        function generateCharts(charts) {
+            // Generate learners chart
+            generateBarChart('learnersChart', charts.learners);
+            
+            // Generate rating distribution chart
+            generateBarChart('ratingChart', charts.ratings);
+            
+            // Generate learning types chart
+            generateBarChart('typesChart', charts.types);
+            generateTypesLegend(charts.types);
+            
+            // Generate weekly progress chart
+            generateBarChart('weeklyChart', charts.weekly);
+        }
+        
+        function generateBarChart(containerId, data) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">No data available</div>';
+                return;
+            }
+            
+            const maxValue = Math.max(...data.map(item => item.value));
+            
+            data.forEach((item, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                const height = (item.value / maxValue) * 80; // 80% max height
+                bar.style.height = height + '%';
+                bar.title = `${item.label}: ${item.value}`;
+                
+                // Add color variation
+                const hue = (index * 360 / data.length) % 360;
+                bar.style.background = `linear-gradient(to top, hsl(${hue}, 70%, 50%), hsl(${hue + 60}, 70%, 60%))`;
+                
+                container.appendChild(bar);
+            });
+        }
+        
+        function generateTypesLegend(data) {
+            const legend = document.getElementById('typesLegend');
+            legend.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                
+                const hue = (index * 360 / data.length) % 360;
+                legendItem.innerHTML = `
+                    <div class="legend-color" style="background: hsl(${hue}, 70%, 50%);"></div>
+                    <span>${item.label}</span>
+                `;
+                
+                legend.appendChild(legendItem);
+            });
+        }
+        
+        function generateInsights(insights) {
+            const list = document.getElementById('insightsList');
+            list.innerHTML = '';
+            
+            insights.forEach(insight => {
+                const item = document.createElement('li');
+                item.className = 'insight-item';
+                item.textContent = insight;
+                list.appendChild(item);
+            });
+        }
+        
+        function refreshAnalytics() {
+            loadAnalytics();
+        }
+        
+        function handleError(error) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+            console.error('Error loading analytics:', error);
+        }
+    </script>
+</body>
+</html>

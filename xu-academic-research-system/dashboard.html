@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>XU Academic Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        .dashboard-container {
+            padding: 20px;
+            min-height: 100vh;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .quick-actions {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .quick-actions h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .action-btn:hover::before {
+            left: 100%;
+        }
+        
+        .recent-activity {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .recent-activity h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .activity-item {
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 15px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .activity-time {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            float: right;
+        }
+        
+        .activity-text {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1 class="floating">🎓 XU Exponential University</h1>
+            <p>Academic Research Management System Dashboard</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card pulse">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" id="memberCount"><?= data.memberCount ?></div>
+                <div class="stat-label">Active Members</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-number" id="learningCount"><?= data.activeLearning ?></div>
+                <div class="stat-label">Learning Activities</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🚀</div>
+                <div class="stat-number" id="projectCount"><?= data.projectCount ?></div>
+                <div class="stat-label">Active Projects</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">💡</div>
+                <div class="stat-number" id="ideaCount"><?= data.ideaCount ?></div>
+                <div class="stat-label">Academic Ideas</div>
+            </div>
+        </div>
+        
+        <div class="quick-actions">
+            <h3>🚀 Quick Actions</h3>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="google.script.run.showAddMemberDialog()">
+                    👤 Add Member
+                </button>
+                <button class="action-btn" onclick="google.script.run.showLearningActivityDialog()">
+                    📖 Log Learning
+                </button>
+                <button class="action-btn" onclick="google.script.run.showAbilityAssessmentDialog()">
+                    🧠 Assess Skills
+                </button>
+                <button class="action-btn" onclick="google.script.run.showCreateProjectDialog()">
+                    🛠️ Create Project
+                </button>
+                <button class="action-btn" onclick="google.script.run.showAcademicIdeaDialog()">
+                    💭 Submit Idea
+                </button>
+                <button class="action-btn" onclick="google.script.run.showEventDialog()">
+                    📅 Schedule Event
+                </button>
+            </div>
+        </div>
+        
+        <div class="recent-activity">
+            <h3>📈 Recent System Activity</h3>
+            <div class="activity-item">
+                <span class="activity-time">2 hours ago</span>
+                <div class="activity-text">New research project "AI Ethics in Education" created</div>
+            </div>
+            <div class="activity-item">
+                <span class="activity-time">5 hours ago</span>
+                <div class="activity-text">Member completed "Advanced Machine Learning" course</div>
+            </div>
+            <div class="activity-item">
+                <span class="activity-time">1 day ago</span>
+                <div class="activity-text">Academic idea "Quantum Computing Applications" submitted</div>
+            </div>
+            <div class="activity-item">
+                <span class="activity-time">2 days ago</span>
+                <div class="activity-text">New member "Dr. Sarah Chen" joined the system</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate numbers counting up
+            animateNumbers();
+            
+            // Add hover effects to cards
+            addCardEffects();
+            
+            // Simulate real-time updates
+            setInterval(updateTimestamp, 60000); // Update every minute
+        });
+        
+        function animateNumbers() {
+            const numbers = document.querySelectorAll('.stat-number');
+            numbers.forEach(num => {
+                const target = parseInt(num.textContent);
+                let current = 0;
+                const increment = target / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    num.textContent = Math.floor(current);
+                }, 30);
+            });
+        }
+        
+        function addCardEffects() {
+            const cards = document.querySelectorAll('.stat-card, .quick-actions, .recent-activity');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+        
+        function updateTimestamp() {
+            const now = new Date().toLocaleString();
+            console.log('Dashboard updated at:', now);
+        }
+        
+        // Add particle effect background
+        function createParticles() {
+            const container = document.querySelector('.dashboard-container');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '4px';
+                particle.style.height = '4px';
+                particle.style.backgroundColor = 'rgba(255,255,255,0.3)';
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `floating ${3 + Math.random() * 4}s ease-in-out infinite`;
+                particle.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        createParticles();
+    </script>
+</body>
+</html>

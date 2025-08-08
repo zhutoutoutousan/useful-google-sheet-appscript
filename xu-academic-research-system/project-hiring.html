@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Project Hiring - Cyberpunk Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Futuristic hexagon pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(0, 128, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 0, 128, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #0080ff;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 20px rgba(0, 128, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(0, 128, 255, 0.1), transparent);
+            animation: rotate-scan 4s linear infinite;
+        }
+        
+        @keyframes rotate-scan {
+            to { transform: rotate(360deg); }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #0080ff, 0 0 20px #0080ff, 0 0 30px #0080ff;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #00ffff;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #0080ff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .project-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0080ff;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 128, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 49%, rgba(0, 128, 255, 0.1) 50%, transparent 51%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 128, 255, 0.4);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #0080ff;
+            text-shadow: 0 0 5px #0080ff;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #0080ff;
+            border-radius: 5px;
+            color: #0080ff;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .filter-select:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 20px;
+        }
+        
+        .project-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #0080ff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 128, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 128, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(0, 128, 255, 0.4);
+            border-color: #00ffff;
+        }
+        
+        .project-card:hover::before {
+            left: 100%;
+        }
+        
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .project-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            margin-bottom: 5px;
+        }
+        
+        .project-status {
+            font-size: 0.8rem;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .status-active { background: #00ff41; color: #000; }
+        .status-planning { background: #0080ff; color: #fff; }
+        .status-recruiting { background: #ff8000; color: #000; }
+        .status-urgent { background: #ff0080; color: #fff; }
+        
+        .project-leader {
+            font-size: 0.9rem;
+            color: #ff0080;
+            margin-bottom: 10px;
+        }
+        
+        .project-description {
+            font-size: 0.9rem;
+            color: #cccccc;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+        
+        .skills-section {
+            margin-bottom: 15px;
+        }
+        
+        .skills-title {
+            font-size: 0.9rem;
+            color: #ff0080;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .skill-tag {
+            background: rgba(0, 255, 65, 0.2);
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .project-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        .detail-label {
+            font-size: 0.8rem;
+            color: #ff0080;
+            font-weight: bold;
+        }
+        
+        .detail-value {
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+        
+        .progress-section {
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0080ff, #00ffff);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progress-shimmer 2s infinite;
+        }
+        
+        @keyframes progress-shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .apply-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .apply-btn {
+            background: linear-gradient(45deg, #0080ff, #00ffff);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .apply-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 128, 255, 0.5);
+        }
+        
+        .team-size {
+            font-size: 0.9rem;
+            color: #cccccc;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #0080ff, #00ffff);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 128, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 PROJECT HIRING</h1>
+            <p>Join cutting-edge research initiatives</p>
+        </div>
+        
+        <div id="loading" class="loading">
+            Scanning for opportunities...
+        </div>
+        
+        <div id="hiringContent" style="display: none;">
+            <div class="project-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalProjects">0</div>
+                    <div class="stat-label">Open Projects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="urgentProjects">0</div>
+                    <div class="stat-label">Urgent Hiring</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalPositions">0</div>
+                    <div class="stat-label">Total Positions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgBudget">$0</div>
+                    <div class="stat-label">Avg Budget</div>
+                </div>
+            </div>
+            
+            <div class="filters">
+                <select id="statusFilter" class="filter-select">
+                    <option value="">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Planning">Planning</option>
+                    <option value="Recruiting">Recruiting</option>
+                </select>
+                <select id="skillFilter" class="filter-select">
+                    <option value="">All Skills</option>
+                </select>
+                <select id="budgetFilter" class="filter-select">
+                    <option value="">All Budgets</option>
+                    <option value="0-10000">$0 - $10K</option>
+                    <option value="10000-50000">$10K - $50K</option>
+                    <option value="50000-100000">$50K - $100K</option>
+                    <option value="100000+">$100K+</option>
+                </select>
+            </div>
+            
+            <div id="projectsGrid" class="projects-grid">
+                <!-- Projects will be populated here -->
+            </div>
+        </div>
+        
+        <div id="noData" class="no-data" style="display: none;">
+            <h3>🤖 No hiring opportunities found</h3>
+            <p>Check back later for new project openings!</p>
+            <button class="refresh-btn" onclick="loadProjectHiring()">Refresh Data</button>
+        </div>
+        
+        <button class="refresh-btn" onclick="loadProjectHiring()">🔄 Refresh Opportunities</button>
+    </div>
+    
+    <script>
+        let allProjects = [];
+        
+        // Pre-loaded data from backend
+        let projectHiringData = <?= JSON.stringify(projectHiringData) ?>;
+        
+        // Load project hiring data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[PROJECT-HIRING] 🌟 Page loaded, starting initialization');
+            loadProjectHiring();
+            setupFilters();
+        });
+        
+        function setupFilters() {
+            const filters = ['statusFilter', 'skillFilter', 'budgetFilter'];
+            filters.forEach(filterId => {
+                document.getElementById(filterId).addEventListener('change', applyFilters);
+            });
+        }
+        
+        function loadProjectHiring() {
+            console.log('[PROJECT-HIRING] 🚀 Starting loadProjectHiring()');
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('hiringContent').style.display = 'none';
+            document.getElementById('noData').style.display = 'none';
+            
+            // Use pre-loaded data from template
+            console.log('[PROJECT-HIRING] 📊 Using pre-loaded data from template');
+            console.log('[PROJECT-HIRING] 📊 Template data:', projectHiringData);
+            
+            // Handle potential double-stringification
+            if (typeof projectHiringData === 'string') {
+                console.log('[PROJECT-HIRING] 🔄 Parsing string data');
+                projectHiringData = JSON.parse(projectHiringData);
+            }
+            
+            console.log('[PROJECT-HIRING] ✅ Received data from backend:', projectHiringData);
+            console.log('[PROJECT-HIRING] 📊 Data type:', typeof projectHiringData);
+            console.log('[PROJECT-HIRING] 📊 Data structure:', projectHiringData);
+            
+            displayProjectHiring(projectHiringData);
+        }
+        
+        function displayProjectHiring(data) {
+            console.log('[PROJECT-HIRING] 🎯 displayProjectHiring called with:', data);
+            document.getElementById('loading').style.display = 'none';
+            
+            if (!data) {
+                console.log('[PROJECT-HIRING] ❌ No data received');
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+            
+            if (!data.projects || data.projects.length === 0) {
+                console.log('[PROJECT-HIRING] ❌ No projects in data');
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+            
+            console.log('[PROJECT-HIRING] ✅ Data received successfully, projects count:', data.projects.length);
+            allProjects = data.projects;
+            
+            // Update stats
+            document.getElementById('totalProjects').textContent = data.stats.total;
+            document.getElementById('urgentProjects').textContent = data.stats.urgent;
+            document.getElementById('totalPositions').textContent = data.stats.positions;
+            document.getElementById('avgBudget').textContent = '$' + data.stats.avgBudget.toLocaleString();
+            
+            // Populate skill filter
+            populateSkillFilter(data.skills);
+            
+            // Display all projects
+            displayProjectCards(allProjects);
+            
+            document.getElementById('hiringContent').style.display = 'block';
+        }
+        
+        function populateSkillFilter(skills) {
+            const skillFilter = document.getElementById('skillFilter');
+            skillFilter.innerHTML = '<option value="">All Skills</option>';
+            skills.forEach(skill => {
+                const option = document.createElement('option');
+                option.value = skill;
+                option.textContent = skill;
+                skillFilter.appendChild(option);
+            });
+        }
+        
+        function displayProjectCards(projects) {
+            const projectsGrid = document.getElementById('projectsGrid');
+            projectsGrid.innerHTML = '';
+            
+            projects.forEach((project, index) => {
+                const projectCard = createProjectCard(project);
+                projectsGrid.appendChild(projectCard);
+                
+                // Animate card appearance
+                setTimeout(() => {
+                    projectCard.style.opacity = '0';
+                    projectCard.style.transform = 'translateY(20px)';
+                    projectCard.style.transition = 'all 0.5s ease';
+                    setTimeout(() => {
+                        projectCard.style.opacity = '1';
+                        projectCard.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        }
+        
+        function createProjectCard(project) {
+            const card = document.createElement('div');
+            card.className = 'project-card';
+            
+            const statusClass = project.status.toLowerCase().replace(/\s+/g, '-');
+            const skills = project.skillsRequired.split(',').map(s => s.trim()).filter(s => s);
+            const endDate = project.endDate ? new Date(project.endDate).toLocaleDateString() : 'TBD';
+            const budget = project.budget ? '$' + Number(project.budget).toLocaleString() : 'TBD';
+            
+            card.innerHTML = `
+                <div class="project-header">
+                    <div>
+                        <div class="project-title">${project.title}</div>
+                        <div class="project-leader">👨‍💼 Led by: ${project.leaderName}</div>
+                    </div>
+                    <div class="project-status status-${statusClass}">${project.status}</div>
+                </div>
+                
+                <div class="project-description">
+                    ${project.description}
+                </div>
+                
+                <div class="skills-section">
+                    <div class="skills-title">🔧 Skills Required:</div>
+                    <div class="skills-list">
+                        ${skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                    </div>
+                </div>
+                
+                <div class="project-details">
+                    <div class="detail-item">
+                        <span class="detail-label">📅 Deadline:</span>
+                        <span class="detail-value">${endDate}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">💰 Budget:</span>
+                        <span class="detail-value">${budget}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">👥 Team Size:</span>
+                        <span class="detail-value">${project.teamSize} members</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">🔗 Repository:</span>
+                        <span class="detail-value">${project.repositoryUrl || 'TBD'}</span>
+                    </div>
+                </div>
+                
+                <div class="progress-section">
+                    <div class="detail-label">📊 Progress: ${project.progress}%</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${project.progress}%"></div>
+                    </div>
+                </div>
+                
+                <div class="apply-section">
+                    <button class="apply-btn" onclick="applyToProject('${project.id}')">
+                        Apply Now
+                    </button>
+                    <span class="team-size">Positions available</span>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function applyToProject(projectId) {
+            // This would typically open an application form or contact dialog
+            alert('🚀 Application submitted! The project leader will contact you soon.');
+        }
+        
+        function applyFilters() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const skillFilter = document.getElementById('skillFilter').value;
+            const budgetFilter = document.getElementById('budgetFilter').value;
+            
+            let filtered = allProjects;
+            
+            if (statusFilter) {
+                filtered = filtered.filter(project => project.status === statusFilter);
+            }
+            
+            if (skillFilter) {
+                filtered = filtered.filter(project => 
+                    project.skillsRequired.toLowerCase().includes(skillFilter.toLowerCase())
+                );
+            }
+            
+            if (budgetFilter) {
+                if (budgetFilter === '100000+') {
+                    filtered = filtered.filter(project => Number(project.budget) >= 100000);
+                } else {
+                    const [min, max] = budgetFilter.split('-').map(Number);
+                    filtered = filtered.filter(project => {
+                        const budget = Number(project.budget) || 0;
+                        return budget >= min && budget <= max;
+                    });
+                }
+            }
+            
+            displayProjectCards(filtered);
+        }
+        
+        function handleError(error) {
+            console.log('[PROJECT-HIRING] ❌ Error occurred:', error);
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+            console.error('Error loading project hiring:', error);
+        }
+    </script>
+</body>
+</html>
