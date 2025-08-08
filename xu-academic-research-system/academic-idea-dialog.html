@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Submit Academic Idea</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+            min-height: 100vh;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            max-width: 800px;
+            margin: 0 auto;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .success-message,
+        .error-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .member-dropdown {
+            position: relative;
+        }
+        
+        .member-search {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .member-dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .member-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .member-option:hover {
+            background: #f8f9fa;
+        }
+        
+        .category-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .category-option {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid transparent;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-option:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .category-option.selected {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .category-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .category-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .keyword-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .keyword-tag {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .keyword-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .keyword-tag .remove {
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .impact-scale {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .impact-scale h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .impact-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        
+        .impact-option {
+            background: white;
+            border: 2px solid #e0e6ed;
+            padding: 15px 10px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .impact-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .impact-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .impact-emoji {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .impact-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .character-counter {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .collaboration-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .collaboration-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .collaboration-options {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .collaboration-option {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 120px;
+        }
+        
+        .collaboration-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .collaboration-option.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        
+        .floating-animation {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .word-count {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        
+        .idea-preview {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .preview-header {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .preview-content {
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h2 class="floating-animation">💡 Submit Academic Idea</h2>
+            <p>Share your innovative research concepts and academic insights</p>
+        </div>
+        
+        <form id="ideaForm">
+            <div id="messageContainer"></div>
+            
+            <div class="form-group member-dropdown">
+                <label for="submitterSearch">Submitter <span class="required">*</span></label>
+                <input type="text" id="submitterSearch" class="member-search" 
+                       placeholder="Search for submitter..." autocomplete="off">
+                <div id="submitterDropdown" class="member-dropdown-list"></div>
+                <input type="hidden" id="selectedSubmitterId" name="submitterId" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="title">Idea Title <span class="required">*</span></label>
+                <input type="text" id="title" name="title" required maxlength="100"
+                       placeholder="Enter a compelling title for your academic idea...">
+                <div class="character-counter">
+                    <span id="titleCounter">0</span>/100 characters
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Category <span class="required">*</span></label>
+                <div class="category-selector">
+                    <div class="category-option" data-category="Theoretical Research">
+                        <span class="category-icon">🧠</span>
+                        <div class="category-name">Theoretical Research</div>
+                    </div>
+                    <div class="category-option" data-category="Applied Research">
+                        <span class="category-icon">🔬</span>
+                        <div class="category-name">Applied Research</div>
+                    </div>
+                    <div class="category-option" data-category="Technology Innovation">
+                        <span class="category-icon">💻</span>
+                        <div class="category-name">Technology Innovation</div>
+                    </div>
+                    <div class="category-option" data-category="Social Impact">
+                        <span class="category-icon">🌍</span>
+                        <div class="category-name">Social Impact</div>
+                    </div>
+                    <div class="category-option" data-category="Educational Innovation">
+                        <span class="category-icon">📚</span>
+                        <div class="category-name">Educational Innovation</div>
+                    </div>
+                    <div class="category-option" data-category="Interdisciplinary">
+                        <span class="category-icon">🔗</span>
+                        <div class="category-name">Interdisciplinary</div>
+                    </div>
+                </div>
+                <input type="hidden" id="selectedCategory" name="category" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="abstract">Abstract <span class="required">*</span></label>
+                <textarea id="abstract" name="abstract" required maxlength="500"
+                          placeholder="Provide a comprehensive abstract describing your idea, methodology, and expected outcomes..."></textarea>
+                <div class="word-count" id="abstractCounter">0/500 words</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="keywords">Keywords</label>
+                <input type="text" id="keywords" name="keywords" 
+                       placeholder="Enter keywords and press Enter or comma to add...">
+                <div class="keyword-tags" id="keywordTags"></div>
+            </div>
+            
+            <div class="impact-scale">
+                <h4>🎯 Potential Impact Assessment</h4>
+                <div class="impact-options">
+                    <div class="impact-option" data-impact="Local">
+                        <span class="impact-emoji">🏠</span>
+                        <div class="impact-label">Local</div>
+                    </div>
+                    <div class="impact-option" data-impact="Regional">
+                        <span class="impact-emoji">🏙️</span>
+                        <div class="impact-label">Regional</div>
+                    </div>
+                    <div class="impact-option" data-impact="National">
+                        <span class="impact-emoji">🇺🇸</span>
+                        <div class="impact-label">National</div>
+                    </div>
+                    <div class="impact-option" data-impact="Global">
+                        <span class="impact-emoji">🌍</span>
+                        <div class="impact-label">Global</div>
+                    </div>
+                    <div class="impact-option" data-impact="Transformative">
+                        <span class="impact-emoji">⚡</span>
+                        <div class="impact-label">Transformative</div>
+                    </div>
+                </div>
+                <input type="hidden" id="selectedImpact" name="potentialImpact">
+            </div>
+            
+            <div class="form-group">
+                <label for="resourcesNeeded">Resources Needed</label>
+                <textarea id="resourcesNeeded" name="resourcesNeeded" 
+                          placeholder="Describe the funding, equipment, personnel, or other resources required to realize this idea..."></textarea>
+            </div>
+            
+            <div class="collaboration-section">
+                <div class="collaboration-header">
+                    <h4>🤝 Collaboration Preference</h4>
+                    <p>Are you looking for collaborators for this idea?</p>
+                </div>
+                <div class="collaboration-options">
+                    <div class="collaboration-option" data-collab="solo">
+                        <div>🚀 Solo Project</div>
+                    </div>
+                    <div class="collaboration-option" data-collab="small-team">
+                        <div>👥 Small Team</div>
+                    </div>
+                    <div class="collaboration-option" data-collab="large-team">
+                        <div>🏢 Large Team</div>
+                    </div>
+                    <div class="collaboration-option" data-collab="open">
+                        <div>🌐 Open Collaboration</div>
+                    </div>
+                </div>
+                <input type="hidden" id="collaborationPreference" name="collaborationPreference">
+            </div>
+            
+            <div class="idea-preview" id="ideaPreview">
+                <div class="preview-header">
+                    <span>👁️</span> Idea Preview
+                </div>
+                <div class="preview-content" id="previewContent">
+                    Your idea preview will appear here as you type...
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary" onclick="togglePreview()">
+                    👁️ Preview
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="google.script.host.close()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Submit Idea
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        let selectedCategory = '';
+        let selectedImpact = '';
+        let collaborationPref = '';
+        let members = [];
+        let keywordsList = [];
+        
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMembers();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // Category selection
+            document.querySelectorAll('.category-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.category-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedCategory = this.dataset.category;
+                    document.getElementById('selectedCategory').value = selectedCategory;
+                    updatePreview();
+                });
+            });
+            
+            // Impact selection
+            document.querySelectorAll('.impact-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.impact-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedImpact = this.dataset.impact;
+                    document.getElementById('selectedImpact').value = selectedImpact;
+                    updatePreview();
+                });
+            });
+            
+            // Collaboration preference
+            document.querySelectorAll('.collaboration-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.collaboration-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    collaborationPref = this.dataset.collab;
+                    document.getElementById('collaborationPreference').value = collaborationPref;
+                });
+            });
+            
+            // Character counters
+            document.getElementById('title').addEventListener('input', function() {
+                updateCharacterCounter('title', 'titleCounter', 100);
+                updatePreview();
+            });
+            
+            document.getElementById('abstract').addEventListener('input', function() {
+                updateWordCounter('abstract', 'abstractCounter', 500);
+                updatePreview();
+            });
+            
+            // Keywords input
+            const keywordsInput = document.getElementById('keywords');
+            keywordsInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    addKeywordTag(this.value.trim());
+                    this.value = '';
+                }
+            });
+            
+            keywordsInput.addEventListener('blur', function() {
+                if (this.value.trim()) {
+                    addKeywordTag(this.value.trim());
+                    this.value = '';
+                }
+            });
+            
+            // Submitter search
+            setupMemberSearch();
+        }
+        
+        function setupMemberSearch() {
+            const searchInput = document.getElementById('submitterSearch');
+            const dropdown = document.getElementById('submitterDropdown');
+            
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterMembers(query);
+            });
+            
+            searchInput.addEventListener('focus', function() {
+                dropdown.style.display = 'block';
+                filterMembers(this.value.toLowerCase());
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.member-dropdown')) {
+                    dropdown.style.display = 'none';
+                }
+            });
+        }
+        
+        function loadMembers() {
+            google.script.run
+                .withSuccessHandler(function(memberList) {
+                    members = memberList;
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading members:', error);
+                })
+                .getAllMembers();
+        }
+        
+        function filterMembers(query) {
+            const dropdown = document.getElementById('submitterDropdown');
+            dropdown.innerHTML = '';
+            
+            let filteredMembers = members;
+            if (query) {
+                filteredMembers = members.filter(member => 
+                    member.name.toLowerCase().includes(query) || 
+                    member.email.toLowerCase().includes(query)
+                );
+            }
+            
+            filteredMembers.forEach(member => {
+                const option = document.createElement('div');
+                option.className = 'member-option';
+                option.innerHTML = `<strong>${member.name}</strong><br><small>${member.email}</small>`;
+                option.addEventListener('click', function() {
+                    selectMember(member);
+                });
+                dropdown.appendChild(option);
+            });
+        }
+        
+        function selectMember(member) {
+            document.getElementById('submitterSearch').value = member.name;
+            document.getElementById('selectedSubmitterId').value = member.id;
+            document.getElementById('submitterDropdown').style.display = 'none';
+        }
+        
+        function updateCharacterCounter(inputId, counterId, maxChars) {
+            const input = document.getElementById(inputId);
+            const counter = document.getElementById(counterId);
+            const currentLength = input.value.length;
+            
+            counter.textContent = currentLength;
+            
+            if (currentLength > maxChars * 0.9) {
+                counter.style.color = '#e74c3c';
+            } else if (currentLength > maxChars * 0.7) {
+                counter.style.color = '#f39c12';
+            } else {
+                counter.style.color = '#7f8c8d';
+            }
+        }
+        
+        function updateWordCounter(inputId, counterId, maxWords) {
+            const input = document.getElementById(inputId);
+            const counter = document.getElementById(counterId);
+            const words = input.value.trim().split(/\s+/).filter(word => word.length > 0);
+            const currentWords = words.length;
+            
+            counter.textContent = `${currentWords}/${maxWords} words`;
+            
+            if (currentWords > maxWords * 0.9) {
+                counter.style.color = '#e74c3c';
+            } else if (currentWords > maxWords * 0.7) {
+                counter.style.color = '#f39c12';
+            } else {
+                counter.style.color = '#7f8c8d';
+            }
+        }
+        
+        function addKeywordTag(keyword) {
+            if (!keyword || keyword.length < 2) return;
+            if (keywordsList.includes(keyword)) return;
+            
+            keywordsList.push(keyword);
+            updateKeywordTags();
+        }
+        
+        function removeKeywordTag(keyword) {
+            keywordsList = keywordsList.filter(k => k !== keyword);
+            updateKeywordTags();
+        }
+        
+        function updateKeywordTags() {
+            const container = document.getElementById('keywordTags');
+            container.innerHTML = '';
+            
+            keywordsList.forEach(keyword => {
+                const tag = document.createElement('span');
+                tag.className = 'keyword-tag';
+                tag.innerHTML = `${keyword} <span class="remove" onclick="removeKeywordTag('${keyword}')">&times;</span>`;
+                container.appendChild(tag);
+            });
+        }
+        
+        function togglePreview() {
+            const preview = document.getElementById('ideaPreview');
+            if (preview.style.display === 'none' || !preview.style.display) {
+                preview.style.display = 'block';
+                updatePreview();
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+        
+        function updatePreview() {
+            const previewContent = document.getElementById('previewContent');
+            const title = document.getElementById('title').value || 'Untitled Idea';
+            const abstract = document.getElementById('abstract').value || 'No abstract provided yet...';
+            
+            previewContent.innerHTML = `
+                <h3 style="color: #667eea; margin-bottom: 10px;">${title}</h3>
+                <div style="margin-bottom: 10px;">
+                    <strong>Category:</strong> ${selectedCategory || 'Not selected'}
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>Potential Impact:</strong> ${selectedImpact || 'Not assessed'}
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <strong>Keywords:</strong> ${keywordsList.join(', ') || 'None specified'}
+                </div>
+                <div>
+                    <strong>Abstract:</strong><br>
+                    ${abstract}
+                </div>
+            `;
+        }
+        
+        // Form submission
+        document.getElementById('ideaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+            
+            const formData = collectFormData();
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    submitBtn.textContent = 'Submit Idea';
+                    submitBtn.disabled = false;
+                    
+                    if (result.success) {
+                        showMessage('success', result.message);
+                        setTimeout(() => {
+                            google.script.host.close();
+                        }, 2000);
+                    } else {
+                        showMessage('error', result.message);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    submitBtn.textContent = 'Submit Idea';
+                    submitBtn.disabled = false;
+                    showMessage('error', 'Error: ' + error.message);
+                })
+                .submitAcademicIdea(formData);
+        });
+        
+        function validateForm() {
+            const requiredFields = ['selectedSubmitterId', 'title', 'abstract'];
+            let isValid = true;
+            
+            if (!selectedCategory) {
+                showMessage('error', 'Please select a category');
+                isValid = false;
+            }
+            
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (!field.value.trim()) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
+                showMessage('error', 'Please fill in all required fields');
+            }
+            
+            return isValid;
+        }
+        
+        function collectFormData() {
+            return {
+                submitterId: document.getElementById('selectedSubmitterId').value,
+                title: document.getElementById('title').value.trim(),
+                abstract: document.getElementById('abstract').value.trim(),
+                category: selectedCategory,
+                keywords: keywordsList.join(', '),
+                potentialImpact: selectedImpact,
+                resourcesNeeded: document.getElementById('resourcesNeeded').value.trim(),
+                collaborationPreference: collaborationPref
+            };
+        }
+        
+        function showMessage(type, message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageClass = type === 'success' ? 'success-message' : 'error-message';
+            
+            messageContainer.innerHTML = `<div class="${messageClass}">${message}</div>`;
+            
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

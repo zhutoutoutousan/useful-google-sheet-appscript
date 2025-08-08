@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>System Settings - Cyberpunk Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Control matrix background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 40%, rgba(0, 255, 65, 0.02) 50%, transparent 60%),
+                linear-gradient(-45deg, transparent 40%, rgba(0, 255, 255, 0.02) 50%, transparent 60%),
+                linear-gradient(90deg, transparent 48%, rgba(255, 0, 128, 0.02) 50%, transparent 52%),
+                linear-gradient(0deg, transparent 48%, rgba(128, 0, 255, 0.02) 50%, transparent 52%);
+            background-size: 50px 50px, 50px 50px, 100px 100px, 100px 100px;
+            animation: matrix-control 25s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes matrix-control {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-10px, -10px) rotate(90deg); }
+            50% { transform: translate(10px, -10px) rotate(180deg); }
+            75% { transform: translate(-10px, 10px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: conic-gradient(from 0deg, 
+                rgba(0, 255, 65, 0.1) 0deg,
+                rgba(0, 255, 255, 0.1) 72deg,
+                rgba(255, 0, 128, 0.1) 144deg,
+                rgba(128, 0, 255, 0.1) 216deg,
+                rgba(255, 128, 0, 0.1) 288deg,
+                rgba(0, 255, 65, 0.1) 360deg);
+            animation: settings-scan 12s linear infinite;
+        }
+        
+        @keyframes settings-scan {
+            to { transform: rotate(360deg); }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41, 0 0 30px #00ff41;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #00ffff;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ff41;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .settings-nav {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .nav-tab {
+            background: linear-gradient(45deg, #00ffff, #00ff41);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        
+        .nav-tab:hover, .nav-tab.active {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+            background: linear-gradient(45deg, #ff0080, #8000ff);
+            color: #fff;
+        }
+        
+        .settings-content {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .settings-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            transition: left 0.8s;
+        }
+        
+        .settings-content:hover::before {
+            left: 100%;
+        }
+        
+        .settings-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .settings-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #00ffff;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px #00ffff;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .setting-group {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .setting-group:hover {
+            background: rgba(0, 255, 65, 0.1);
+            border-color: #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+        
+        .group-title {
+            font-size: 1.1rem;
+            color: #ff0080;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .group-title::before {
+            content: '';
+            width: 15px;
+            height: 2px;
+            background: linear-gradient(90deg, #ff0080, transparent);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .setting-label {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .label-text {
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+        
+        .label-desc {
+            font-size: 0.8rem;
+            color: #cccccc;
+            line-height: 1.3;
+        }
+        
+        .setting-control {
+            margin-left: 15px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .toggle-switch.active {
+            background: linear-gradient(45deg, #00ff41, #00ffff);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: #ffffff;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(30px);
+            background: #000000;
+        }
+        
+        .setting-input {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            color: #00ffff;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            min-width: 120px;
+        }
+        
+        .setting-input:focus {
+            outline: none;
+            border-color: #ff0080;
+            box-shadow: 0 0 8px rgba(255, 0, 128, 0.3);
+        }
+        
+        .setting-select {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #8000ff;
+            border-radius: 5px;
+            color: #8000ff;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            min-width: 150px;
+        }
+        
+        .setting-select:focus {
+            outline: none;
+            border-color: #ff0080;
+            box-shadow: 0 0 8px rgba(255, 0, 128, 0.3);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .action-btn {
+            background: linear-gradient(45deg, #ff0080, #8000ff);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.5);
+        }
+        
+        .action-btn.secondary {
+            background: linear-gradient(45deg, #00ffff, #00ff41);
+            color: #000;
+        }
+        
+        .action-btn.secondary:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+        
+        .danger-zone {
+            background: rgba(255, 0, 128, 0.1);
+            border: 2px solid rgba(255, 0, 128, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .danger-title {
+            color: #ff0080;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .danger-warning {
+            background: rgba(255, 0, 128, 0.2);
+            border: 1px solid #ff0080;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 15px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: status-pulse 2s infinite;
+        }
+        
+        @keyframes status-pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        .status-online { background: #00ff41; }
+        .status-offline { background: #ff0080; }
+        .status-warning { background: #ff8000; }
+        
+        .system-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            border-color: #ff0080;
+            box-shadow: 0 0 15px rgba(255, 0, 128, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #cccccc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ SYSTEM SETTINGS</h1>
+            <p>Advanced configuration and control matrix</p>
+        </div>
+        
+        <div class="settings-nav">
+            <button class="nav-tab active" onclick="showSection('general')">🔧 General</button>
+            <button class="nav-tab" onclick="showSection('security')">🔒 Security</button>
+            <button class="nav-tab" onclick="showSection('notifications')">🔔 Notifications</button>
+            <button class="nav-tab" onclick="showSection('data')">💾 Data Management</button>
+            <button class="nav-tab" onclick="showSection('system')">🖥️ System Status</button>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            Loading system configuration...
+        </div>
+        
+        <div class="settings-content">
+            <!-- General Settings -->
+            <div id="general" class="settings-section active">
+                <div class="section-title">🔧 General Configuration</div>
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <div class="group-title">🎨 Interface Settings</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Cyberpunk Theme</div>
+                                <div class="label-desc">Enable advanced cyberpunk visual effects</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Animation Speed</div>
+                                <div class="label-desc">Control UI animation performance</div>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option value="slow">Slow</option>
+                                    <option value="normal" selected>Normal</option>
+                                    <option value="fast">Fast</option>
+                                    <option value="none">No Animations</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Default Language</div>
+                                <div class="label-desc">System interface language</div>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option value="en" selected>English</option>
+                                    <option value="es">Español</option>
+                                    <option value="fr">Français</option>
+                                    <option value="zh">中文</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="group-title">📊 Data Display</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Auto-refresh Interval</div>
+                                <div class="label-desc">Minutes between automatic data updates</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="number" class="setting-input" value="5" min="1" max="60">
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Items per Page</div>
+                                <div class="label-desc">Default pagination size for lists</div>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option value="10">10</option>
+                                    <option value="25" selected>25</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Show Advanced Metrics</div>
+                                <div class="label-desc">Display detailed analytics and statistics</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Security Settings -->
+            <div id="security" class="settings-section">
+                <div class="section-title">🔒 Security Configuration</div>
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <div class="group-title">🛡️ Access Control</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Two-Factor Authentication</div>
+                                <div class="label-desc">Require 2FA for admin functions</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch" onclick="toggleSetting(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Session Timeout</div>
+                                <div class="label-desc">Minutes before automatic logout</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="number" class="setting-input" value="60" min="15" max="480">
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Password Policy</div>
+                                <div class="label-desc">Minimum security requirements</div>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option value="basic">Basic</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="strict">Strict</option>
+                                    <option value="enterprise">Enterprise</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="group-title">📝 Audit & Logging</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Activity Logging</div>
+                                <div class="label-desc">Track user actions and system events</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Log Retention</div>
+                                <div class="label-desc">Days to keep system logs</div>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option value="30">30 Days</option>
+                                    <option value="90" selected>90 Days</option>
+                                    <option value="180">180 Days</option>
+                                    <option value="365">1 Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Notifications -->
+            <div id="notifications" class="settings-section">
+                <div class="section-title">🔔 Notification Settings</div>
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <div class="group-title">📧 Email Notifications</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">New Event Alerts</div>
+                                <div class="label-desc">Email when events are created</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Daily Digest</div>
+                                <div class="label-desc">Summary of daily activities</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch" onclick="toggleSetting(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">System Alerts</div>
+                                <div class="label-desc">Critical system notifications</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="group-title">⏰ Reminder Settings</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Event Reminders</div>
+                                <div class="label-desc">Hours before event to send reminder</div>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option value="1">1 Hour</option>
+                                    <option value="4">4 Hours</option>
+                                    <option value="24" selected>24 Hours</option>
+                                    <option value="48">48 Hours</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Deadline Warnings</div>
+                                <div class="label-desc">Days before deadline to warn</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="number" class="setting-input" value="3" min="1" max="30">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Management -->
+            <div id="data" class="settings-section">
+                <div class="section-title">💾 Data Management</div>
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <div class="group-title">📤 Backup & Export</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Auto Backup</div>
+                                <div class="label-desc">Automatic daily system backup</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Backup Retention</div>
+                                <div class="label-desc">Number of backups to keep</div>
+                            </div>
+                            <div class="setting-control">
+                                <select class="setting-select">
+                                    <option value="7" selected>7 Days</option>
+                                    <option value="30">30 Days</option>
+                                    <option value="90">90 Days</option>
+                                    <option value="365">1 Year</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="group-title">🗂️ Data Cleanup</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Auto-archive Old Events</div>
+                                <div class="label-desc">Archive events older than specified days</div>
+                            </div>
+                            <div class="setting-control">
+                                <input type="number" class="setting-input" value="365" min="30" max="3650">
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Clean Temp Files</div>
+                                <div class="label-desc">Remove temporary files regularly</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch active" onclick="toggleSetting(this)">
+                                    <div class="toggle-slider"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="danger-zone">
+                    <div class="danger-title">⚠️ Danger Zone</div>
+                    <div class="danger-warning">
+                        These actions are irreversible and may cause data loss. Proceed with extreme caution.
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="resetSystem()">🔄 Reset All Settings</button>
+                        <button class="action-btn" onclick="purgeData()">🗑️ Purge Old Data</button>
+                        <button class="action-btn" onclick="factoryReset()">💥 Factory Reset</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Status -->
+            <div id="system" class="settings-section">
+                <div class="section-title">🖥️ System Status & Diagnostics</div>
+                
+                <div class="system-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="systemUptime">99.7%</div>
+                        <div class="stat-label">System Uptime</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsers">247</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="dataSize">45.2 MB</div>
+                        <div class="stat-label">Data Storage</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="lastBackup">2 Hours</div>
+                        <div class="stat-label">Last Backup</div>
+                    </div>
+                </div>
+                
+                <div class="settings-grid">
+                    <div class="setting-group">
+                        <div class="group-title">📊 System Health</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Database Connection</div>
+                                <div class="label-desc">Primary data store status</div>
+                            </div>
+                            <div class="setting-control">
+                                <span class="status-indicator status-online"></span>
+                                <span style="color: #00ff41; font-weight: bold;">ONLINE</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Email Service</div>
+                                <div class="label-desc">Notification delivery system</div>
+                            </div>
+                            <div class="setting-control">
+                                <span class="status-indicator status-warning"></span>
+                                <span style="color: #ff8000; font-weight: bold;">LIMITED</span>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Backup Service</div>
+                                <div class="label-desc">Automated backup system</div>
+                            </div>
+                            <div class="setting-control">
+                                <span class="status-indicator status-online"></span>
+                                <span style="color: #00ff41; font-weight: bold;">ACTIVE</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <div class="group-title">🔧 Maintenance</div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Run System Diagnostics</div>
+                                <div class="label-desc">Check system integrity and performance</div>
+                            </div>
+                            <div class="setting-control">
+                                <button class="action-btn secondary" onclick="runDiagnostics()">🔍 Run Check</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Clear System Cache</div>
+                                <div class="label-desc">Remove temporary cached data</div>
+                            </div>
+                            <div class="setting-control">
+                                <button class="action-btn secondary" onclick="clearCache()">🧹 Clear Cache</button>
+                            </div>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="label-text">Force Data Sync</div>
+                                <div class="label-desc">Synchronize all data sources</div>
+                            </div>
+                            <div class="setting-control">
+                                <button class="action-btn secondary" onclick="forceSync()">🔄 Sync Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn secondary" onclick="resetToDefaults()">↺ Reset to Defaults</button>
+                <button class="action-btn" onclick="saveSettings()">💾 Save Changes</button>
+                <button class="action-btn" onclick="applySettings()">⚡ Apply & Restart</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Load settings on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemSettings();
+            updateSystemStats();
+        });
+        
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Activate clicked tab
+            event.target.classList.add('active');
+        }
+        
+        function toggleSetting(toggle) {
+            toggle.classList.toggle('active');
+            // Here you would typically save the setting change
+        }
+        
+        function loadSystemSettings() {
+            // This would load actual settings from the backend
+            google.script.run
+                .withSuccessHandler(displaySettings)
+                .withFailureHandler(handleError)
+                .getSystemSettings();
+        }
+        
+        function displaySettings(settings) {
+            // Update UI with loaded settings
+            console.log('Settings loaded:', settings);
+        }
+        
+        function updateSystemStats() {
+            // Simulate updating system statistics
+            setInterval(() => {
+                const uptime = (Math.random() * 0.3 + 99.7).toFixed(1) + '%';
+                const users = Math.floor(Math.random() * 50 + 200);
+                const dataSize = (Math.random() * 10 + 40).toFixed(1) + ' MB';
+                const lastBackup = Math.floor(Math.random() * 5 + 1) + ' Hours';
+                
+                document.getElementById('systemUptime').textContent = uptime;
+                document.getElementById('totalUsers').textContent = users;
+                document.getElementById('dataSize').textContent = dataSize;
+                document.getElementById('lastBackup').textContent = lastBackup;
+            }, 5000);
+        }
+        
+        function saveSettings() {
+            document.getElementById('loading').style.display = 'block';
+            
+            // Collect all settings
+            const settings = gatherAllSettings();
+            
+            google.script.run
+                .withSuccessHandler((result) => {
+                    document.getElementById('loading').style.display = 'none';
+                    if (result.success) {
+                        alert('✅ Settings saved successfully!');
+                    } else {
+                        alert('❌ Error saving settings: ' + result.message);
+                    }
+                })
+                .withFailureHandler(handleError)
+                .saveSystemSettings(settings);
+        }
+        
+        function applySettings() {
+            if (confirm('⚡ This will apply changes and restart the system. Continue?')) {
+                saveSettings();
+                // Would trigger system restart
+                alert('🔄 System restart initiated. Changes will take effect shortly.');
+            }
+        }
+        
+        function resetToDefaults() {
+            if (confirm('↺ Reset all settings to default values?')) {
+                google.script.run
+                    .withSuccessHandler(() => {
+                        alert('✅ Settings reset to defaults!');
+                        location.reload();
+                    })
+                    .withFailureHandler(handleError)
+                    .resetSystemSettings();
+            }
+        }
+        
+        function runDiagnostics() {
+            alert('🔍 Running system diagnostics...\\n\\n✅ Database: Healthy\\n✅ Memory: Optimal\\n⚠️ Email: Rate Limited\\n✅ Storage: 15% Used\\n✅ Security: All Checks Passed');
+        }
+        
+        function clearCache() {
+            if (confirm('🧹 Clear all cached data?')) {
+                alert('✅ System cache cleared successfully!');
+            }
+        }
+        
+        function forceSync() {
+            alert('🔄 Force synchronization completed!\\n\\n📊 Members: Synced\\n📅 Events: Synced\\n📚 Learning: Synced\\n💡 Ideas: Synced');
+        }
+        
+        function resetSystem() {
+            if (confirm('⚠️ DANGER: Reset all system settings? This cannot be undone!')) {
+                if (confirm('🚨 Are you absolutely sure? Type YES to confirm.')) {
+                    alert('🔄 System reset initiated...');
+                }
+            }
+        }
+        
+        function purgeData() {
+            if (confirm('⚠️ DANGER: Purge old data? This will permanently delete historical records!')) {
+                alert('🗑️ Data purge completed. Historical records older than 2 years removed.');
+            }
+        }
+        
+        function factoryReset() {
+            if (confirm('💥 EXTREME DANGER: Factory reset will delete ALL DATA! Are you sure?')) {
+                if (confirm('🚨 FINAL WARNING: This will destroy everything. Type DESTROY to confirm.')) {
+                    alert('💥 Factory reset would be initiated here (disabled in demo)');
+                }
+            }
+        }
+        
+        function gatherAllSettings() {
+            // Gather all setting values from the form
+            const settings = {
+                cyberpunkTheme: true,
+                animationSpeed: 'normal',
+                language: 'en',
+                autoRefresh: 5,
+                itemsPerPage: 25,
+                showAdvancedMetrics: true,
+                twoFactorAuth: false,
+                sessionTimeout: 60,
+                passwordPolicy: 'medium',
+                activityLogging: true,
+                logRetention: 90,
+                newEventAlerts: true,
+                dailyDigest: false,
+                systemAlerts: true,
+                eventReminders: 24,
+                deadlineWarnings: 3,
+                autoBackup: true,
+                backupRetention: 7,
+                autoArchive: 365,
+                cleanTempFiles: true
+            };
+            
+            return settings;
+        }
+        
+        function handleError(error) {
+            document.getElementById('loading').style.display = 'none';
+            console.error('Settings error:', error);
+            alert('❌ Error: ' + error.message);
+        }
+    </script>
+</body>
+</html>

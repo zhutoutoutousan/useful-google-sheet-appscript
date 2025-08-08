@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Competency Reports - Cyberpunk Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Neural network background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(128, 0, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 20% 80%, rgba(255, 0, 128, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 255, 65, 0.15) 0%, transparent 50%);
+            animation: neural-pulse 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes neural-pulse {
+            0%, 100% { opacity: 0.3; }
+            25% { opacity: 0.7; }
+            50% { opacity: 0.5; }
+            75% { opacity: 0.8; }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #8000ff;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 30px rgba(128, 0, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                45deg,
+                rgba(128, 0, 255, 0.1) 0%,
+                rgba(0, 255, 255, 0.1) 25%,
+                rgba(255, 0, 128, 0.1) 50%,
+                rgba(0, 255, 65, 0.1) 75%,
+                rgba(128, 0, 255, 0.1) 100%
+            );
+            animation: competency-flow 6s linear infinite;
+        }
+        
+        @keyframes competency-flow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #8000ff, 0 0 20px #8000ff, 0 0 30px #8000ff;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #00ffff;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #8000ff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .reports-toolbar {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .toolbar-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .toolbar-label {
+            color: #00ffff;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .toolbar-select, .toolbar-input {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #8000ff;
+            border-radius: 5px;
+            color: #8000ff;
+            padding: 8px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .toolbar-select:focus, .toolbar-input:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        
+        .generate-btn {
+            background: linear-gradient(45deg, #8000ff, #ff0080);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: auto;
+        }
+        
+        .generate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(128, 0, 255, 0.5);
+        }
+        
+        .reports-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .report-section {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .report-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .report-section:hover::before {
+            left: 100%;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #00ffff;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-shadow: 0 0 5px #00ffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffff, transparent);
+        }
+        
+        .competency-matrix {
+            display: grid;
+            grid-template-columns: 200px repeat(auto-fit, minmax(80px, 1fr));
+            gap: 2px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .matrix-header {
+            background: rgba(0, 255, 65, 0.8);
+            color: #000;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .matrix-member {
+            background: rgba(0, 255, 255, 0.8);
+            color: #000;
+            padding: 10px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .matrix-cell {
+            padding: 8px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .matrix-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .level-0, .level-1 { background: #ff0080; color: #fff; }
+        .level-2, .level-3 { background: #ff8000; color: #000; }
+        .level-4, .level-5 { background: #ffff00; color: #000; }
+        .level-6, .level-7 { background: #00ff41; color: #000; }
+        .level-8, .level-9 { background: #00ffff; color: #000; }
+        .level-10 { background: #8000ff; color: #fff; }
+        
+        .skills-radar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .radar-chart {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ff0080;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .radar-title {
+            color: #ff0080;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .radar-visual {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #ff0080 0deg,
+                #ff8000 72deg,
+                #ffff00 144deg,
+                #00ff41 216deg,
+                #00ffff 288deg,
+                #ff0080 360deg
+            );
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: radar-spin 10s linear infinite;
+        }
+        
+        @keyframes radar-spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .radar-visual::before {
+            content: '';
+            width: 70%;
+            height: 70%;
+            background: #0a0a0a;
+            border-radius: 50%;
+            position: absolute;
+        }
+        
+        .radar-score {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .gaps-analysis {
+            background: rgba(255, 0, 128, 0.1);
+            border: 1px solid #ff0080;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .gaps-title {
+            color: #ff0080;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .gap-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 0, 128, 0.2);
+        }
+        
+        .gap-item:last-child {
+            border-bottom: none;
+        }
+        
+        .gap-skill {
+            color: #fff;
+            font-weight: bold;
+        }
+        
+        .gap-severity {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .severity-critical { background: #ff0080; color: #fff; }
+        .severity-high { background: #ff8000; color: #000; }
+        .severity-medium { background: #ffff00; color: #000; }
+        .severity-low { background: #00ff41; color: #000; }
+        
+        .recommendations {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .recommendations-title {
+            color: #00ff41;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+        }
+        
+        .recommendation-item:last-child {
+            border-bottom: none;
+        }
+        
+        .recommendation-priority {
+            background: #00ff41;
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .recommendation-text {
+            color: #fff;
+            line-height: 1.4;
+            flex: 1;
+        }
+        
+        .export-section {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .export-title {
+            color: #00ffff;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            background: linear-gradient(45deg, #00ffff, #8000ff);
+            color: #000;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .export-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 COMPETENCY REPORTS</h1>
+            <p>Advanced skill gap analysis and team intelligence</p>
+        </div>
+        
+        <div class="reports-toolbar">
+            <div class="toolbar-section">
+                <span class="toolbar-label">📊 Report Type:</span>
+                <select id="reportType" class="toolbar-select">
+                    <option value="team-overview">Team Overview</option>
+                    <option value="skill-gaps">Skill Gap Analysis</option>
+                    <option value="individual">Individual Assessment</option>
+                    <option value="department">Department Comparison</option>
+                </select>
+            </div>
+            
+            <div class="toolbar-section">
+                <span class="toolbar-label">👥 Focus Area:</span>
+                <select id="focusArea" class="toolbar-select">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            
+            <div class="toolbar-section">
+                <span class="toolbar-label">🎯 Minimum Level:</span>
+                <input type="number" id="minLevel" class="toolbar-input" min="1" max="10" value="1" style="width: 80px;">
+            </div>
+            
+            <button class="generate-btn" onclick="generateReport()">🔄 Generate Report</button>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            Analyzing competencies...
+        </div>
+        
+        <div id="reportsContent" style="display: none;">
+            <div class="reports-grid">
+                <div class="report-section">
+                    <div class="section-title">🎯 Competency Heat Map</div>
+                    <div class="competency-matrix" id="competencyMatrix">
+                        <!-- Matrix will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <div class="section-title">📡 Skills Radar</div>
+                    <div class="skills-radar" id="skillsRadar">
+                        <!-- Radar charts will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reports-grid">
+                <div class="report-section">
+                    <div class="section-title">⚠️ Skill Gap Analysis</div>
+                    <div class="gaps-analysis">
+                        <div class="gaps-title">Critical Skill Gaps</div>
+                        <div id="skillGaps">
+                            <!-- Gaps will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-section">
+                    <div class="section-title">💡 Recommendations</div>
+                    <div class="recommendations">
+                        <div class="recommendations-title">AI-Powered Suggestions</div>
+                        <div id="recommendations">
+                            <!-- Recommendations will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="export-section">
+                <div class="export-title">📄 Export Reports</div>
+                <div class="export-buttons">
+                    <button class="export-btn" onclick="exportReport('pdf')">📋 PDF Report</button>
+                    <button class="export-btn" onclick="exportReport('excel')">📊 Excel Sheet</button>
+                    <button class="export-btn" onclick="exportReport('summary')">📝 Executive Summary</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="noData" class="no-data">
+            <h3>🤖 Select report parameters</h3>
+            <p>Configure your competency analysis settings and click Generate Report.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Load competency reports on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFocusAreas();
+            showNoData();
+        });
+        
+        function loadFocusAreas() {
+            google.script.run
+                .withSuccessHandler(populateFocusAreas)
+                .withFailureHandler(handleError)
+                .getSkillCategories();
+        }
+        
+        function populateFocusAreas(categories) {
+            const select = document.getElementById('focusArea');
+            select.innerHTML = '<option value="">All Categories</option>';
+            
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                select.appendChild(option);
+            });
+        }
+        
+        function generateReport() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('reportsContent').style.display = 'none';
+            document.getElementById('noData').style.display = 'none';
+            
+            const params = {
+                reportType: document.getElementById('reportType').value,
+                focusArea: document.getElementById('focusArea').value,
+                minLevel: parseInt(document.getElementById('minLevel').value) || 1
+            };
+            
+            google.script.run
+                .withSuccessHandler(displayReport)
+                .withFailureHandler(handleError)
+                .generateCompetencyReport(params);
+        }
+        
+        function displayReport(data) {
+            document.getElementById('loading').style.display = 'none';
+            
+            if (!data || !data.matrix) {
+                showNoData();
+                return;
+            }
+            
+            // Generate competency matrix
+            generateCompetencyMatrix(data.matrix);
+            
+            // Generate skills radar
+            generateSkillsRadar(data.radar);
+            
+            // Display skill gaps
+            displaySkillGaps(data.gaps);
+            
+            // Display recommendations
+            displayRecommendations(data.recommendations);
+            
+            document.getElementById('reportsContent').style.display = 'block';
+        }
+        
+        function generateCompetencyMatrix(matrixData) {
+            const container = document.getElementById('competencyMatrix');
+            container.innerHTML = '';
+            
+            if (!matrixData.members || matrixData.members.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #666;">No competency data available</div>';
+                return;
+            }
+            
+            // Create headers
+            const memberHeader = document.createElement('div');
+            memberHeader.className = 'matrix-header';
+            memberHeader.textContent = 'Team Member';
+            container.appendChild(memberHeader);
+            
+            matrixData.skills.forEach(skill => {
+                const skillHeader = document.createElement('div');
+                skillHeader.className = 'matrix-header';
+                skillHeader.textContent = skill.substring(0, 10) + (skill.length > 10 ? '...' : '');
+                skillHeader.title = skill;
+                container.appendChild(skillHeader);
+            });
+            
+            // Create member rows
+            matrixData.members.forEach(member => {
+                const memberCell = document.createElement('div');
+                memberCell.className = 'matrix-member';
+                memberCell.textContent = member.name;
+                container.appendChild(memberCell);
+                
+                matrixData.skills.forEach(skill => {
+                    const level = member.skills[skill] || 0;
+                    const cell = document.createElement('div');
+                    cell.className = `matrix-cell level-${level}`;
+                    cell.textContent = level;
+                    cell.title = `${member.name} - ${skill}: Level ${level}`;
+                    container.appendChild(cell);
+                });
+            });
+        }
+        
+        function generateSkillsRadar(radarData) {
+            const container = document.getElementById('skillsRadar');
+            container.innerHTML = '';
+            
+            radarData.forEach(item => {
+                const radarDiv = document.createElement('div');
+                radarDiv.className = 'radar-chart';
+                
+                radarDiv.innerHTML = `
+                    <div class="radar-title">${item.category}</div>
+                    <div class="radar-visual">
+                        <div class="radar-score">${item.avgLevel.toFixed(1)}</div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 0.8rem; color: #cccccc;">
+                        ${item.memberCount} members assessed
+                    </div>
+                `;
+                
+                container.appendChild(radarDiv);
+            });
+        }
+        
+        function displaySkillGaps(gaps) {
+            const container = document.getElementById('skillGaps');
+            container.innerHTML = '';
+            
+            if (gaps.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No critical skill gaps identified</div>';
+                return;
+            }
+            
+            gaps.forEach(gap => {
+                const gapDiv = document.createElement('div');
+                gapDiv.className = 'gap-item';
+                
+                let severityClass = 'severity-low';
+                if (gap.severity >= 8) severityClass = 'severity-critical';
+                else if (gap.severity >= 6) severityClass = 'severity-high';
+                else if (gap.severity >= 4) severityClass = 'severity-medium';
+                
+                gapDiv.innerHTML = `
+                    <div class="gap-skill">${gap.skill}</div>
+                    <div class="gap-severity ${severityClass}">
+                        ${gap.severity >= 8 ? 'Critical' : gap.severity >= 6 ? 'High' : gap.severity >= 4 ? 'Medium' : 'Low'}
+                    </div>
+                `;
+                
+                container.appendChild(gapDiv);
+            });
+        }
+        
+        function displayRecommendations(recommendations) {
+            const container = document.getElementById('recommendations');
+            container.innerHTML = '';
+            
+            if (recommendations.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No specific recommendations at this time</div>';
+                return;
+            }
+            
+            recommendations.forEach(rec => {
+                const recDiv = document.createElement('div');
+                recDiv.className = 'recommendation-item';
+                
+                recDiv.innerHTML = `
+                    <div class="recommendation-priority">${rec.priority}</div>
+                    <div class="recommendation-text">${rec.text}</div>
+                `;
+                
+                container.appendChild(recDiv);
+            });
+        }
+        
+        function exportReport(format) {
+            const params = {
+                reportType: document.getElementById('reportType').value,
+                focusArea: document.getElementById('focusArea').value,
+                minLevel: parseInt(document.getElementById('minLevel').value) || 1,
+                format: format
+            };
+            
+            google.script.run
+                .withSuccessHandler((result) => {
+                    if (result.success) {
+                        alert(`📄 ${format.toUpperCase()} report generated successfully!`);
+                    } else {
+                        alert('❌ Error generating report: ' + result.message);
+                    }
+                })
+                .withFailureHandler(handleError)
+                .exportCompetencyReport(params);
+        }
+        
+        function showNoData() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('reportsContent').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+        }
+        
+        function handleError(error) {
+            document.getElementById('loading').style.display = 'none';
+            showNoData();
+            console.error('Error loading competency reports:', error);
+        }
+    </script>
+</body>
+</html>

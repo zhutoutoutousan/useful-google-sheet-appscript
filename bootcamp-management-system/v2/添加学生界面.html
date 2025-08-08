@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>添加新学生</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .required {
+            color: #ea4335;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #4285f4;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .teacher-select {
+            position: relative;
+        }
+        
+        .teacher-select::after {
+            content: '👨‍🏫';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 16px;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4285f4, #1a73e8);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(66, 133, 244, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #5f6368;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e8eaed;
+            border-color: #c0c0c0;
+        }
+        
+        .icon {
+            margin-right: 8px;
+        }
+        
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+            color: #137333;
+            font-weight: 500;
+            margin-top: 20px;
+            padding: 12px;
+            background: #e8f5e8;
+            border-radius: 8px;
+        }
+        
+        .error-message {
+            display: none;
+            text-align: center;
+            color: #d93025;
+            font-weight: 500;
+            margin-top: 20px;
+            padding: 12px;
+            background: #fce8e6;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 添加新学生</h1>
+            <p>请填写学生的基本信息</p>
+        </div>
+        
+        <form id="studentForm">
+            <div class="form-group">
+                <label for="name">姓名 <span class="required">*</span></label>
+                <input type="text" id="name" name="name" required placeholder="请输入学生姓名">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">邮箱 <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required placeholder="student@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">电话</label>
+                    <input type="tel" id="phone" name="phone" placeholder="13800138000">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="startDate">入学日期 <span class="required">*</span></label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="level">当前等级 <span class="required">*</span></label>
+                    <select id="level" name="level" required>
+                        <option value="">请选择等级</option>
+                        <option value="初级">🌱 初级</option>
+                        <option value="中级">📚 中级</option>
+                        <option value="高级">🚀 高级</option>
+                        <option value="专家">👑 专家</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group teacher-select">
+                <label for="teacher">指导老师</label>
+                <select id="teacher" name="teacher">
+                    <option value="">正在加载教师列表...</option>
+                </select>
+            </div>
+            
+            <div class="buttons">
+                <button type="button" class="btn btn-secondary" onclick="关闭对话框()">
+                    <span class="icon">❌</span>取消
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <span class="icon">✅</span>添加学生
+                </button>
+            </div>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            🎉 学生添加成功！
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            ❌ 添加失败，请检查输入信息
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时设置今天的日期为默认值
+        document.getElementById('startDate').valueAsDate = new Date();
+        
+        // 加载教师列表
+        google.script.run
+            .withSuccessHandler(填充教师列表)
+            .withFailureHandler(处理教师加载错误)
+            .获取教师列表();
+        
+        function 填充教师列表(teachers) {
+            const select = document.getElementById('teacher');
+            select.innerHTML = '<option value="">请选择指导老师</option>';
+            
+            teachers.forEach(teacher => {
+                const option = document.createElement('option');
+                option.value = teacher.name;
+                option.textContent = `${teacher.name} (${teacher.specialization})`;
+                select.appendChild(option);
+            });
+        }
+        
+        function 处理教师加载错误(error) {
+            const select = document.getElementById('teacher');
+            select.innerHTML = '<option value="">加载教师失败</option>';
+            console.error('加载教师列表失败:', error);
+        }
+        
+        function 关闭对话框() {
+            google.script.host.close();
+        }
+        
+        function 显示加载状态() {
+            document.getElementById('loading').style.display = 'block';
+            document.querySelector('form').style.opacity = '0.5';
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+        }
+        
+        function 隐藏加载状态() {
+            document.getElementById('loading').style.display = 'none';
+            document.querySelector('form').style.opacity = '1';
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
+        }
+        
+        function 显示成功消息() {
+            document.getElementById('successMessage').style.display = 'block';
+            setTimeout(() => {
+                关闭对话框();
+            }, 2000);
+        }
+        
+        function 显示错误消息(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message || '❌ 添加失败，请检查输入信息';
+            errorDiv.style.display = 'block';
+        }
+        
+        // 表单提交处理
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                startDate: formData.get('startDate'), // 保持为字符串格式
+                level: formData.get('level'),
+                teacher: formData.get('teacher')
+            };
+            
+            // 验证必填字段
+            if (!data.name || !data.email || !data.level) {
+                显示错误消息('请填写所有必填字段');
+                return;
+            }
+            
+            显示加载状态();
+            
+            // 调用后端函数
+            google.script.run
+                .withSuccessHandler(function(studentId) {
+                    隐藏加载状态();
+                    显示成功消息();
+                    console.log('学生添加成功，ID:', studentId);
+                })
+                .withFailureHandler(function(error) {
+                    隐藏加载状态();
+                    显示错误消息(error.toString());
+                    console.error('添加学生失败:', error);
+                })
+                .添加新学生(data.name, data.email, data.phone, data.startDate, data.level, data.teacher);
+        });
+        
+        // 输入验证
+        document.getElementById('email').addEventListener('blur', function() {
+            const email = this.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = '#ea4335';
+                this.style.backgroundColor = '#fce8e6';
+            } else {
+                this.style.borderColor = '#e0e0e0';
+                this.style.backgroundColor = '#fafafa';
+            }
+        });
+        
+        document.getElementById('phone').addEventListener('input', function() {
+            // 只允许数字和基本符号
+            this.value = this.value.replace(/[^0-9+\-\s()]/g, '');
+        });
+    </script>
+</body>
+</html>

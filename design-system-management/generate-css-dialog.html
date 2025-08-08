@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <style>
+        body {
+            font-family: 'Google Sans', sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #333;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        .button-group {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .primary-button {
+            background-color: #4285f4;
+            color: white;
+        }
+        .primary-button:hover {
+            background-color: #3367d6;
+        }
+        .secondary-button {
+            background-color: #f8f9fa;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+        }
+        .secondary-button:hover {
+            background-color: #f1f3f4;
+        }
+        .info-box {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        .info-box h4 {
+            margin: 0 0 8px 0;
+            color: #1976d2;
+        }
+        .info-box p {
+            margin: 0;
+            font-size: 14px;
+            color: #1565c0;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Generate CSS Variables</h2>
+        
+        <div class="info-box">
+            <h4>CSS Variable Generation</h4>
+            <p>This will generate CSS custom properties from approved design system mappings. Variables will be exported in the format: <code>--t-gs-{category}-{name}</code></p>
+        </div>
+        
+        <form id="generateForm">
+            <div class="form-group">
+                <label for="portalType">Portal Type</label>
+                <select id="portalType" name="portalType">
+                    <option value="">All Portals</option>
+                    <option value="Hiring Manager">Hiring Manager</option>
+                    <option value="Careers">Careers</option>
+                    <option value="Employee Portal">Employee Portal</option>
+                    <option value="Admin Portal">Admin Portal</option>
+                    <option value="Reports Portal">Reports Portal</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="clientName">Client (Optional)</label>
+                <input type="text" id="clientName" name="clientName" placeholder="Leave empty for all clients">
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="includeComments" name="includeComments" checked>
+                    <label for="includeComments">Include comments in generated CSS</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="validateVariables" name="validateVariables" checked>
+                    <label for="validateVariables">Validate variable values</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="exportToDrive" name="exportToDrive" checked>
+                    <label for="exportToDrive">Export CSS file to Google Drive</label>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button type="button" class="secondary-button" onclick="google.script.host.close()">Cancel</button>
+                <button type="submit" class="primary-button">Generate Variables</button>
+            </div>
+        </form>
+        
+        <div id="result" style="margin-top: 20px; display: none;">
+            <h3>Generation Complete</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('generateForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Show loading state
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Generating...';
+            submitButton.disabled = true;
+            
+            // Call the server function
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    submitButton.textContent = originalText;
+                    submitButton.disabled = false;
+                    
+                    document.getElementById('result').style.display = 'block';
+                    document.getElementById('resultContent').innerHTML = `
+                        <p><strong>Variables Generated:</strong> ${result}</p>
+                        <p>Check the CSS Variable Generation sheet for details.</p>
+                    `;
+                })
+                .withFailureHandler(function(error) {
+                    submitButton.textContent = originalText;
+                    submitButton.disabled = false;
+                    alert('Error generating variables: ' + error.message);
+                })
+                .generateCSSVariables(
+                    data.portalType || null,
+                    data.clientName || null
+                );
+        });
+    </script>
+</body>
+</html>

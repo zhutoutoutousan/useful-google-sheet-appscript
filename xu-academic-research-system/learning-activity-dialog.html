@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Log Learning Activity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+            min-height: 100vh;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .form-row-three {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .form-group .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            pointer-events: none;
+            margin-top: 15px;
+        }
+        
+        .form-group.has-icon input,
+        .form-group.has-icon select {
+            padding-left: 50px;
+        }
+        
+        .success-message,
+        .error-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .learning-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .type-option {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid transparent;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .type-option:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .type-option.selected {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .type-option .emoji {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+        
+        .type-option .label {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .progress-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e0e6ed;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        
+        .progress-slider::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .progress-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            cursor: pointer;
+            border: none;
+        }
+        
+        .progress-value {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .skill-tag {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .skill-tag:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .member-dropdown {
+            position: relative;
+        }
+        
+        .member-search {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .member-dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .member-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .member-option:hover {
+            background: #f8f9fa;
+        }
+        
+        .member-option:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h2>📚 Log Learning Activity</h2>
+            <p>Track your academic progress and learning journey</p>
+        </div>
+        
+        <form id="learningForm">
+            <div id="messageContainer"></div>
+            
+            <div class="form-group">
+                <label>Learning Activity Type <span class="required">*</span></label>
+                <div class="learning-type-grid">
+                    <div class="type-option" data-type="YouTube Video">
+                        <span class="emoji">📺</span>
+                        <span class="label">YouTube Video</span>
+                    </div>
+                    <div class="type-option" data-type="Online Course">
+                        <span class="emoji">💻</span>
+                        <span class="label">Online Course</span>
+                    </div>
+                    <div class="type-option" data-type="Book">
+                        <span class="emoji">📖</span>
+                        <span class="label">Book</span>
+                    </div>
+                    <div class="type-option" data-type="Academic Paper">
+                        <span class="emoji">📄</span>
+                        <span class="label">Research Paper</span>
+                    </div>
+                    <div class="type-option" data-type="Conference">
+                        <span class="emoji">🎤</span>
+                        <span class="label">Conference</span>
+                    </div>
+                    <div class="type-option" data-type="Workshop">
+                        <span class="emoji">🛠️</span>
+                        <span class="label">Workshop</span>
+                    </div>
+                    <div class="type-option" data-type="Seminar">
+                        <span class="emoji">🎓</span>
+                        <span class="label">Seminar</span>
+                    </div>
+                    <div class="type-option" data-type="Peer Discussion">
+                        <span class="emoji">💬</span>
+                        <span class="label">Discussion</span>
+                    </div>
+                </div>
+                <input type="hidden" id="activityType" name="type" required>
+            </div>
+            
+            <div class="form-group member-dropdown">
+                <label for="memberSearch">Select Member <span class="required">*</span></label>
+                <input type="text" id="memberSearch" class="member-search" 
+                       placeholder="Search for a member..." autocomplete="off">
+                <div id="memberDropdown" class="member-dropdown-list"></div>
+                <input type="hidden" id="selectedMemberId" name="memberId" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="title">Title/Name <span class="required">*</span></label>
+                <input type="text" id="title" name="title" required 
+                       placeholder="e.g., 'Advanced Machine Learning Course' or 'Deep Learning Paper'">
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" 
+                          placeholder="Describe what this learning activity covers..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="source">Source/URL</label>
+                <input type="url" id="source" name="source" 
+                       placeholder="https://example.com/course or book publisher">
+            </div>
+            
+            <div class="form-row-three">
+                <div class="form-group">
+                    <label for="duration">Duration (hours)</label>
+                    <input type="number" id="duration" name="duration" min="0" step="0.5" 
+                           placeholder="0.5">
+                </div>
+                
+                <div class="form-group">
+                    <label for="progress">Progress %</label>
+                    <input type="range" id="progress" name="progress" class="progress-slider" 
+                           min="0" max="100" value="0">
+                    <span class="progress-value">0%</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="rating">Rating (1-5)</label>
+                    <select id="rating" name="rating">
+                        <option value="">Select rating</option>
+                        <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                        <option value="4">⭐⭐⭐⭐ Good</option>
+                        <option value="3">⭐⭐⭐ Average</option>
+                        <option value="2">⭐⭐ Poor</option>
+                        <option value="1">⭐ Very Poor</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="completionDate">Completion Date</label>
+                    <input type="date" id="completionDate" name="completionDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="skillsGained">Skills/Concepts Gained</label>
+                    <input type="text" id="skillsGained" name="skillsGained" 
+                           placeholder="e.g., Neural Networks, Python, Statistics">
+                    <div class="skill-tags" id="skillTags"></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="notes">Additional Notes</label>
+                <textarea id="notes" name="notes" 
+                          placeholder="Any additional insights, reflections, or notes..."></textarea>
+            </div>
+            
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary" onclick="google.script.host.close()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Log Activity
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        let selectedType = '';
+        let members = [];
+        
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMembers();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // Learning type selection
+            document.querySelectorAll('.type-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedType = this.dataset.type;
+                    document.getElementById('activityType').value = selectedType;
+                });
+            });
+            
+            // Progress slider
+            const progressSlider = document.getElementById('progress');
+            const progressValue = document.querySelector('.progress-value');
+            progressSlider.addEventListener('input', function() {
+                progressValue.textContent = this.value + '%';
+            });
+            
+            // Member search
+            const memberSearch = document.getElementById('memberSearch');
+            const memberDropdown = document.getElementById('memberDropdown');
+            
+            memberSearch.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterMembers(query);
+            });
+            
+            memberSearch.addEventListener('focus', function() {
+                memberDropdown.style.display = 'block';
+                filterMembers(this.value.toLowerCase());
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.member-dropdown')) {
+                    memberDropdown.style.display = 'none';
+                }
+            });
+            
+            // Skills input
+            const skillsInput = document.getElementById('skillsGained');
+            skillsInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    addSkillTag(this.value.trim());
+                    this.value = '';
+                }
+            });
+        }
+        
+        function loadMembers() {
+            google.script.run
+                .withSuccessHandler(function(memberList) {
+                    members = memberList;
+                    populateMembers(members);
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading members:', error);
+                })
+                .getAllMembers();
+        }
+        
+        function populateMembers(memberList) {
+            const dropdown = document.getElementById('memberDropdown');
+            dropdown.innerHTML = '';
+            
+            memberList.forEach(member => {
+                const option = document.createElement('div');
+                option.className = 'member-option';
+                option.innerHTML = `<strong>${member.name}</strong><br><small>${member.email}</small>`;
+                option.addEventListener('click', function() {
+                    selectMember(member);
+                });
+                dropdown.appendChild(option);
+            });
+        }
+        
+        function filterMembers(query) {
+            if (!query) {
+                populateMembers(members);
+                return;
+            }
+            
+            const filtered = members.filter(member => 
+                member.name.toLowerCase().includes(query) || 
+                member.email.toLowerCase().includes(query)
+            );
+            populateMembers(filtered);
+        }
+        
+        function selectMember(member) {
+            document.getElementById('memberSearch').value = member.name;
+            document.getElementById('selectedMemberId').value = member.id;
+            document.getElementById('memberDropdown').style.display = 'none';
+        }
+        
+        function addSkillTag(skill) {
+            if (!skill || skill.length < 2) return;
+            
+            const skillTags = document.getElementById('skillTags');
+            const tag = document.createElement('span');
+            tag.className = 'skill-tag';
+            tag.textContent = skill;
+            tag.addEventListener('click', function() {
+                this.remove();
+            });
+            skillTags.appendChild(tag);
+        }
+        
+        // Form submission
+        document.getElementById('learningForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Logging...';
+            submitBtn.disabled = true;
+            
+            const formData = collectFormData();
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    submitBtn.textContent = 'Log Activity';
+                    submitBtn.disabled = false;
+                    
+                    if (result.success) {
+                        showMessage('success', result.message);
+                        setTimeout(() => {
+                            google.script.host.close();
+                        }, 2000);
+                    } else {
+                        showMessage('error', result.message);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    submitBtn.textContent = 'Log Activity';
+                    submitBtn.disabled = false;
+                    showMessage('error', 'Error: ' + error.message);
+                })
+                .addLearningActivity(formData);
+        });
+        
+        function validateForm() {
+            const requiredFields = ['activityType', 'selectedMemberId', 'title'];
+            let isValid = true;
+            
+            if (!selectedType) {
+                showMessage('error', 'Please select a learning activity type');
+                isValid = false;
+            }
+            
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (!field.value.trim()) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
+                showMessage('error', 'Please fill in all required fields');
+            }
+            
+            return isValid;
+        }
+        
+        function collectFormData() {
+            const skillTags = Array.from(document.querySelectorAll('.skill-tag'))
+                .map(tag => tag.textContent).join(', ');
+            
+            return {
+                type: selectedType,
+                memberId: document.getElementById('selectedMemberId').value,
+                title: document.getElementById('title').value.trim(),
+                description: document.getElementById('description').value.trim(),
+                source: document.getElementById('source').value.trim(),
+                duration: document.getElementById('duration').value || '0',
+                progress: document.getElementById('progress').value || '0',
+                rating: document.getElementById('rating').value,
+                completionDate: document.getElementById('completionDate').value,
+                skillsGained: skillTags,
+                notes: document.getElementById('notes').value.trim()
+            };
+        }
+        
+        function showMessage(type, message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageClass = type === 'success' ? 'success-message' : 'error-message';
+            
+            messageContainer.innerHTML = `<div class="${messageClass}">${message}</div>`;
+            
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

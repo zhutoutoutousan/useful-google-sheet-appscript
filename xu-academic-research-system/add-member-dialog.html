@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Add New Member</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .form-group .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+            font-size: 1.2rem;
+            pointer-events: none;
+            margin-top: 15px;
+        }
+        
+        .form-group.has-icon input,
+        .form-group.has-icon select {
+            padding-left: 50px;
+        }
+        
+        .success-message,
+        .error-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            font-size: 0.8rem;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h2>👤 Add New Member</h2>
+            <p>Welcome a new member to XU Exponential University</p>
+        </div>
+        
+        <form id="memberForm">
+            <div id="messageContainer"></div>
+            
+            <div class="form-row">
+                <div class="form-group has-icon">
+                    <label for="name">Full Name <span class="required">*</span></label>
+                    <span class="icon">👤</span>
+                    <input type="text" id="name" name="name" required placeholder="Enter full name">
+                </div>
+                
+                <div class="form-group has-icon">
+                    <label for="email">Institutional Email <span class="required">*</span></label>
+                    <span class="icon">📧</span>
+                    <input type="email" id="email" name="email" required placeholder="Enter institutional email address">
+                </div>
+                
+                <div class="form-group has-icon">
+                    <label for="googleEmail">Google Email <span class="required">*</span></label>
+                    <span class="icon">🔐</span>
+                    <input type="email" id="googleEmail" name="googleEmail" required 
+                           value="<?= currentUserEmail ?>" readonly 
+                           style="background-color: #f8f9fa; color: #6c757d; cursor: not-allowed;">
+                    <small style="color: #666; font-size: 0.8rem;">Automatically set to your logged-in Google account</small>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group has-icon">
+                    <label for="role">Role <span class="required">*</span></label>
+                    <span class="icon">💼</span>
+                    <select id="role" name="role" required>
+                        <option value="">Select a role</option>
+                        <option value="Student">Student</option>
+                        <option value="Researcher">Researcher</option>
+                        <option value="Professor">Professor</option>
+                        <option value="PhD Candidate">PhD Candidate</option>
+                        <option value="Postdoc">Postdoc</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Guest">Guest</option>
+                    </select>
+                </div>
+                
+                <div class="form-group has-icon">
+                    <label for="department">Department</label>
+                    <span class="icon">🏢</span>
+                    <select id="department" name="department">
+                        <option value="">Select department</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Biology">Biology</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Social Sciences">Social Sciences</option>
+                        <option value="Economics">Economics</option>
+                        <option value="Psychology">Psychology</option>
+                        <option value="Philosophy">Philosophy</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="researchInterests">Research Interests</label>
+                <textarea id="researchInterests" name="researchInterests" 
+                          placeholder="Describe research interests and areas of expertise..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="contactInfo" class="tooltip" data-tooltip="Additional contact information like phone, LinkedIn, etc.">
+                    Contact Information
+                </label>
+                <textarea id="contactInfo" name="contactInfo" 
+                          placeholder="Additional contact information (phone, LinkedIn, etc.)"></textarea>
+            </div>
+            
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary" onclick="google.script.host.close()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Add Member
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        document.getElementById('memberForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageContainer = document.getElementById('messageContainer');
+            
+            // Validate form
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding...';
+            
+            // Collect form data
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                googleEmail: document.getElementById('googleEmail').value.trim(), // This will be pre-populated
+                role: document.getElementById('role').value,
+                department: document.getElementById('department').value,
+                researchInterests: document.getElementById('researchInterests').value.trim(),
+                contactInfo: document.getElementById('contactInfo').value.trim()
+            };
+            
+            // Submit to Google Apps Script
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Add Member';
+                    
+                    if (result.success) {
+                        showMessage('success', result.message);
+                        document.getElementById('memberForm').reset();
+                        
+                        setTimeout(() => {
+                            google.script.host.close();
+                        }, 2000);
+                    } else {
+                        showMessage('error', result.message);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Add Member';
+                    showMessage('error', 'An error occurred: ' + error.message);
+                })
+                .addMember(formData);
+        });
+        
+        function validateForm() {
+            const requiredFields = ['name', 'email', 'googleEmail', 'role'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                const value = field.value.trim();
+                
+                if (!value) {
+                    // Don't highlight readonly fields as errors
+                    if (!field.readOnly) {
+                        field.style.borderColor = '#e74c3c';
+                        isValid = false;
+                        
+                        setTimeout(() => {
+                            field.style.borderColor = '#e0e6ed';
+                        }, 3000);
+                    } else {
+                        // For readonly fields, just check if they have a value
+                        if (!value) {
+                            isValid = false;
+                        }
+                    }
+                }
+            });
+            
+            // Validate email format
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                document.getElementById('email').style.borderColor = '#e74c3c';
+                showMessage('error', 'Please enter a valid email address');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                showMessage('error', 'Please fill in all required fields');
+            }
+            
+            return isValid;
+        }
+        
+        function showMessage(type, message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageClass = type === 'success' ? 'success-message' : 'error-message';
+            
+            messageContainer.innerHTML = `<div class="${messageClass}">${message}</div>`;
+            
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Add input animations
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Add floating label effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (input.value) {
+                    input.parentElement.classList.add('has-value');
+                }
+                
+                input.addEventListener('input', function() {
+                    if (this.value) {
+                        this.parentElement.classList.add('has-value');
+                    } else {
+                        this.parentElement.classList.remove('has-value');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

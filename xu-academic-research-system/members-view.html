@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Members Overview - Cyberpunk Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Cyberpunk grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ff41, #00ffff, #ff0080, #8000ff);
+            border-radius: 10px;
+            z-index: -1;
+            animation: border-glow 3s linear infinite;
+        }
+        
+        @keyframes border-glow {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #00ff41;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ff41;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .member-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(0, 255, 65, 0.4);
+            border-color: #00ffff;
+        }
+        
+        .member-card:hover::before {
+            left: 100%;
+        }
+        
+        .member-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ff41, #00ffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #000;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        .member-info {
+            flex: 1;
+        }
+        
+        .member-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            margin-bottom: 5px;
+        }
+        
+        .member-role {
+            font-size: 0.9rem;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .role-professor, .role-faculty { 
+            background: #8000ff; 
+            color: #fff;
+        }
+        .role-phd { 
+            background: #0080ff; 
+            color: #fff;
+        }
+        .role-research-assistant { 
+            background: #00ffff; 
+            color: #000;
+        }
+        .role-undergraduate { 
+            background: #00ff41; 
+            color: #000;
+        }
+        .role-other { 
+            background: #ff8000; 
+            color: #000;
+        }
+        
+        .member-details {
+            margin-top: 15px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+        }
+        
+        .detail-label {
+            color: #ff0080;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .detail-value {
+            color: #ffffff;
+            font-size: 0.9rem;
+            text-align: right;
+            max-width: 60%;
+            word-wrap: break-word;
+        }
+        
+        .status-active {
+            color: #00ff41;
+            text-shadow: 0 0 3px #00ff41;
+        }
+        
+        .status-inactive {
+            color: #ff0080;
+            text-shadow: 0 0 3px #ff0080;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #00ff41, #00ffff);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.5);
+        }
+        
+        .search-bar {
+            margin-bottom: 20px;
+            padding: 12px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ff41;
+            border-radius: 5px;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+        }
+        
+        .search-bar::placeholder {
+            color: rgba(0, 255, 65, 0.5);
+        }
+        
+        .search-bar:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 MEMBERS OVERVIEW</h1>
+            <p>Team directory and status monitoring</p>
+        </div>
+        
+        <div id="loading" class="loading">
+            Loading member data...
+        </div>
+        
+        <div id="memberContent" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalMembers">0</div>
+                    <div class="stat-label">Total Members</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeMembers">0</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="facultyCount">0</div>
+                    <div class="stat-label">Faculty</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="studentCount">0</div>
+                    <div class="stat-label">Students</div>
+                </div>
+            </div>
+            
+            <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search members by name, role, or department...">
+            
+            <div id="membersGrid" class="members-grid">
+                <!-- Members will be populated here -->
+            </div>
+        </div>
+        
+        <div id="noData" class="no-data" style="display: none;">
+            <h3>🤖 No members found</h3>
+            <p>Start building your team by adding new members!</p>
+            <button class="refresh-btn" onclick="loadMembers()">Refresh Data</button>
+        </div>
+        
+        <button class="refresh-btn" onclick="loadMembers()">🔄 Refresh Members</button>
+    </div>
+    
+    <script>
+        let allMembers = [];
+        
+        // Load members data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[MEMBERS-VIEW] 🌟 Page loaded, starting initialization');
+            loadMembers();
+            setupSearch();
+        });
+        
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function() {
+                filterMembers(this.value);
+            });
+        }
+        
+        function loadMembers() {
+            console.log('[MEMBERS-VIEW] 🚀 Starting loadMembers()');
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('memberContent').style.display = 'none';
+            document.getElementById('noData').style.display = 'none';
+            
+            // Use pre-loaded data instead of async call
+            console.log('[MEMBERS-VIEW] 📊 Using pre-loaded data from template');
+            const membersDataRaw = <?= JSON.stringify(membersData) ?>;
+            console.log('[MEMBERS-VIEW] 📊 Template data (raw):', membersDataRaw);
+            
+            // Parse the data if it's a string
+            let membersData;
+            if (typeof membersDataRaw === 'string') {
+                console.log('[MEMBERS-VIEW] 🔧 Parsing JSON string data');
+                membersData = JSON.parse(membersDataRaw);
+            } else {
+                membersData = membersDataRaw;
+            }
+            console.log('[MEMBERS-VIEW] 📊 Parsed data:', membersData);
+            console.log('[MEMBERS-VIEW] 📊 Data type after parsing:', typeof membersData);
+            
+            // Simulate async behavior for consistency
+            setTimeout(() => {
+                displayMembers(membersData);
+            }, 100);
+        }
+        
+        function displayMembers(data) {
+            console.log('[MEMBERS-VIEW] ✅ Received data from backend:', data);
+            console.log('[MEMBERS-VIEW] 📊 Data type:', typeof data);
+            console.log('[MEMBERS-VIEW] 📊 Data structure:', JSON.stringify(data, null, 2));
+            
+            document.getElementById('loading').style.display = 'none';
+            
+            if (!data) {
+                console.log('[MEMBERS-VIEW] ❌ No data received');
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+            
+            if (!data.members) {
+                console.log('[MEMBERS-VIEW] ❌ No members property in data');
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+            
+            console.log('[MEMBERS-VIEW] 👥 Members array length:', data.members.length);
+            
+            if (data.members.length === 0) {
+                console.log('[MEMBERS-VIEW] ❌ Members array is empty');
+                document.getElementById('noData').style.display = 'block';
+                return;
+            }
+            
+            console.log('[MEMBERS-VIEW] 🎉 Valid members data received! Processing...');
+            allMembers = data.members;
+            
+            // Update stats
+            console.log('[MEMBERS-VIEW] 📈 Updating stats:', data.stats);
+            document.getElementById('totalMembers').textContent = data.stats.total;
+            document.getElementById('activeMembers').textContent = data.stats.active;
+            document.getElementById('facultyCount').textContent = data.stats.faculty;
+            document.getElementById('studentCount').textContent = data.stats.students;
+            
+            // Display all members
+            console.log('[MEMBERS-VIEW] 🎨 Creating member cards for', allMembers.length, 'members');
+            displayMemberCards(allMembers);
+            
+            document.getElementById('memberContent').style.display = 'block';
+            console.log('[MEMBERS-VIEW] ✅ Member content displayed successfully');
+        }
+        
+        function displayMemberCards(members) {
+            console.log('[MEMBERS-VIEW] 🎨 Starting displayMemberCards with', members.length, 'members');
+            const membersGrid = document.getElementById('membersGrid');
+            
+            if (!membersGrid) {
+                console.log('[MEMBERS-VIEW] ❌ membersGrid element not found!');
+                return;
+            }
+            
+            membersGrid.innerHTML = '';
+            console.log('[MEMBERS-VIEW] 🧹 Cleared existing member cards');
+            
+            members.forEach((member, index) => {
+                console.log('[MEMBERS-VIEW] 👤 Creating card for member', index + 1, ':', member.name, '(' + member.id + ')');
+                const memberCard = createMemberCard(member);
+                membersGrid.appendChild(memberCard);
+                
+                // Animate card appearance
+                setTimeout(() => {
+                    memberCard.style.opacity = '0';
+                    memberCard.style.transform = 'translateY(20px)';
+                    memberCard.style.transition = 'all 0.5s ease';
+                    setTimeout(() => {
+                        memberCard.style.opacity = '1';
+                        memberCard.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 100);
+            });
+        }
+        
+        function createMemberCard(member) {
+            const card = document.createElement('div');
+            card.className = 'member-card';
+            
+            const roleClass = member.role.toLowerCase().replace(/\s+/g, '-');
+            const avatar = member.name.charAt(0).toUpperCase();
+            const joinDate = new Date(member.joinDate).toLocaleDateString();
+            const lastActive = new Date(member.lastActive).toLocaleDateString();
+            
+            card.innerHTML = `
+                <div class="member-header">
+                    <div class="member-avatar">${avatar}</div>
+                    <div class="member-info">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-role role-${roleClass}">${member.role}</div>
+                    </div>
+                </div>
+                <div class="member-details">
+                    <div class="detail-row">
+                        <span class="detail-label">📧 Email:</span>
+                        <span class="detail-value">${member.email || 'Not provided'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🏛️ Department:</span>
+                        <span class="detail-value">${member.department || 'Not specified'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">📅 Joined:</span>
+                        <span class="detail-value">${joinDate}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">🕒 Last Active:</span>
+                        <span class="detail-value">${lastActive}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">📊 Status:</span>
+                        <span class="detail-value status-${member.status.toLowerCase()}">${member.status}</span>
+                    </div>
+                    ${member.researchInterests ? `
+                    <div class="detail-row">
+                        <span class="detail-label">🔬 Research:</span>
+                        <span class="detail-value">${member.researchInterests}</span>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function filterMembers(searchTerm) {
+            if (!searchTerm.trim()) {
+                displayMemberCards(allMembers);
+                return;
+            }
+            
+            const filtered = allMembers.filter(member => 
+                member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                member.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (member.department && member.department.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (member.email && member.email.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+            
+            displayMemberCards(filtered);
+        }
+        
+        function handleError(error) {
+            console.log('[MEMBERS-VIEW] ❌ ERROR in handleError:', error);
+            console.log('[MEMBERS-VIEW] ❌ Error type:', typeof error);
+            console.log('[MEMBERS-VIEW] ❌ Error details:', JSON.stringify(error, null, 2));
+            
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+            console.error('Error loading members:', error);
+        }
+    </script>
+</body>
+</html>

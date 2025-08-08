@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ability Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+            min-height: 100vh;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .form-header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .ability-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .category-card {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid transparent;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-card:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .category-card.selected {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .category-card:hover::before {
+            left: 100%;
+        }
+        
+        .category-icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .category-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .skill-level-container {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .skill-level-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .skill-level-header h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .level-slider {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: linear-gradient(to right, #e74c3c 0%, #f39c12 25%, #f1c40f 50%, #2ecc71 75%, #27ae60 100%);
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            margin-bottom: 15px;
+        }
+        
+        .level-slider::-webkit-slider-thumb {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 3px solid #667eea;
+        }
+        
+        .level-slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: 3px solid #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .level-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .level-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .level-description {
+            flex: 1;
+            margin-left: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .level-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 120px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        .success-message,
+        .error-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .member-dropdown {
+            position: relative;
+        }
+        
+        .member-search {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .member-dropdown-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e0e6ed;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .member-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s ease;
+        }
+        
+        .member-option:hover {
+            background: #f8f9fa;
+        }
+        
+        .evidence-upload {
+            border: 2px dashed #667eea;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+            background: rgba(102, 126, 234, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .evidence-upload:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h2>🧠 Ability Assessment</h2>
+            <p>Evaluate and track academic and professional competencies</p>
+        </div>
+        
+        <form id="assessmentForm">
+            <div id="messageContainer"></div>
+            
+            <div class="form-group member-dropdown">
+                <label for="memberSearch">Select Member <span class="required">*</span></label>
+                <input type="text" id="memberSearch" class="member-search" 
+                       placeholder="Search for a member..." autocomplete="off">
+                <div id="memberDropdown" class="member-dropdown-list"></div>
+                <input type="hidden" id="selectedMemberId" name="memberId" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Ability Category <span class="required">*</span></label>
+                <div class="ability-categories">
+                    <div class="category-card" data-category="Academic Rigor">
+                        <span class="category-icon">🎓</span>
+                        <div class="category-name">Academic Rigor</div>
+                    </div>
+                    <div class="category-card" data-category="Mathematics & Statistics">
+                        <span class="category-icon">📊</span>
+                        <div class="category-name">Mathematics & Statistics</div>
+                    </div>
+                    <div class="category-card" data-category="Computer Science">
+                        <span class="category-icon">💻</span>
+                        <div class="category-name">Computer Science</div>
+                    </div>
+                    <div class="category-card" data-category="Natural Sciences">
+                        <span class="category-icon">🔬</span>
+                        <div class="category-name">Natural Sciences</div>
+                    </div>
+                    <div class="category-card" data-category="Social Sciences">
+                        <span class="category-icon">👥</span>
+                        <div class="category-name">Social Sciences</div>
+                    </div>
+                    <div class="category-card" data-category="Engineering">
+                        <span class="category-icon">⚙️</span>
+                        <div class="category-name">Engineering</div>
+                    </div>
+                    <div class="category-card" data-category="Software Development">
+                        <span class="category-icon">🛠️</span>
+                        <div class="category-name">Software Development</div>
+                    </div>
+                    <div class="category-card" data-category="Research Methodology">
+                        <span class="category-icon">🔍</span>
+                        <div class="category-name">Research Methodology</div>
+                    </div>
+                    <div class="category-card" data-category="Critical Thinking">
+                        <span class="category-icon">🤔</span>
+                        <div class="category-name">Critical Thinking</div>
+                    </div>
+                    <div class="category-card" data-category="Communication Skills">
+                        <span class="category-icon">🗣️</span>
+                        <div class="category-name">Communication</div>
+                    </div>
+                </div>
+                <input type="hidden" id="selectedCategory" name="category" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="skill">Specific Skill/Competency <span class="required">*</span></label>
+                <input type="text" id="skill" name="skill" required 
+                       placeholder="e.g., 'Machine Learning', 'Statistical Analysis', 'Python Programming'">
+            </div>
+            
+            <div class="skill-level-container">
+                <div class="skill-level-header">
+                    <h3>Skill Level Assessment</h3>
+                    <p>Rate the current proficiency level (1 = Beginner, 10 = Expert)</p>
+                </div>
+                
+                <div class="level-display">
+                    <div class="level-value" id="levelValue">5</div>
+                    <div class="level-description" id="levelDescription">
+                        <strong>Intermediate:</strong> Has solid understanding and can work independently with some guidance.
+                    </div>
+                </div>
+                
+                <input type="range" id="skillLevel" name="level" class="level-slider" 
+                       min="1" max="10" value="5">
+                
+                <div class="level-labels">
+                    <span>1 - Beginner</span>
+                    <span>3 - Basic</span>
+                    <span>5 - Intermediate</span>
+                    <span>7 - Advanced</span>
+                    <span>10 - Expert</span>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="assessor">Assessor</label>
+                    <input type="text" id="assessor" name="assessor" 
+                           placeholder="Who is conducting this assessment?">
+                </div>
+                
+                <div class="form-group">
+                    <label for="assessmentDate">Assessment Date</label>
+                    <input type="date" id="assessmentDate" name="assessmentDate">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="evidence">Evidence/Portfolio</label>
+                <div class="evidence-upload" onclick="document.getElementById('evidenceFile').click()">
+                    <div class="upload-icon">📎</div>
+                    <div class="upload-text">Click to upload supporting documents or provide links</div>
+                </div>
+                <input type="file" id="evidenceFile" style="display: none;" multiple>
+                <textarea id="evidence" name="evidence" 
+                          placeholder="Describe evidence of this skill (projects, certifications, achievements, portfolio links, etc.)"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="goals">Development Goals</label>
+                <textarea id="goals" name="goals" 
+                          placeholder="What are the next steps for improving this skill?"></textarea>
+            </div>
+            
+            <div class="btn-container">
+                <button type="button" class="btn btn-secondary" onclick="google.script.host.close()">
+                    Cancel
+                </button>
+                <button type="submit" class="btn btn-primary pulse-animation" id="submitBtn">
+                    Submit Assessment
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        let selectedCategory = '';
+        let members = [];
+        
+        const levelDescriptions = {
+            1: { title: "Novice", desc: "Just starting to learn, needs significant guidance and support." },
+            2: { title: "Beginner", desc: "Has basic awareness, can perform simple tasks with help." },
+            3: { title: "Basic", desc: "Can handle routine tasks, understands fundamental concepts." },
+            4: { title: "Developing", desc: "Growing confidence, can work with minimal supervision." },
+            5: { title: "Intermediate", desc: "Has solid understanding, can work independently with some guidance." },
+            6: { title: "Competent", desc: "Reliable performer, can handle complex tasks effectively." },
+            7: { title: "Advanced", desc: "High level of expertise, can mentor others and solve complex problems." },
+            8: { title: "Proficient", desc: "Expert level skills, recognized authority in this area." },
+            9: { title: "Distinguished", desc: "Exceptional expertise, innovates and leads in this field." },
+            10: { title: "Master/Expert", desc: "World-class expertise, sets standards and pioneers new approaches." }
+        };
+        
+        // Initialize the form
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMembers();
+            setupEventListeners();
+            updateLevelDescription(5);
+            document.getElementById('assessmentDate').value = new Date().toISOString().split('T')[0];
+        });
+        
+        function setupEventListeners() {
+            // Category selection
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedCategory = this.dataset.category;
+                    document.getElementById('selectedCategory').value = selectedCategory;
+                });
+            });
+            
+            // Skill level slider
+            const skillLevel = document.getElementById('skillLevel');
+            skillLevel.addEventListener('input', function() {
+                updateLevelDescription(this.value);
+            });
+            
+            // Member search
+            const memberSearch = document.getElementById('memberSearch');
+            const memberDropdown = document.getElementById('memberDropdown');
+            
+            memberSearch.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                filterMembers(query);
+            });
+            
+            memberSearch.addEventListener('focus', function() {
+                memberDropdown.style.display = 'block';
+                filterMembers(this.value.toLowerCase());
+            });
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.member-dropdown')) {
+                    memberDropdown.style.display = 'none';
+                }
+            });
+        }
+        
+        function updateLevelDescription(level) {
+            const description = levelDescriptions[level];
+            document.getElementById('levelValue').textContent = level;
+            document.getElementById('levelDescription').innerHTML = 
+                `<strong>${description.title}:</strong> ${description.desc}`;
+        }
+        
+        function loadMembers() {
+            google.script.run
+                .withSuccessHandler(function(memberList) {
+                    members = memberList;
+                    populateMembers(members);
+                })
+                .withFailureHandler(function(error) {
+                    console.error('Error loading members:', error);
+                })
+                .getAllMembers();
+        }
+        
+        function populateMembers(memberList) {
+            const dropdown = document.getElementById('memberDropdown');
+            dropdown.innerHTML = '';
+            
+            memberList.forEach(member => {
+                const option = document.createElement('div');
+                option.className = 'member-option';
+                option.innerHTML = `<strong>${member.name}</strong><br><small>${member.email}</small>`;
+                option.addEventListener('click', function() {
+                    selectMember(member);
+                });
+                dropdown.appendChild(option);
+            });
+        }
+        
+        function filterMembers(query) {
+            if (!query) {
+                populateMembers(members);
+                return;
+            }
+            
+            const filtered = members.filter(member => 
+                member.name.toLowerCase().includes(query) || 
+                member.email.toLowerCase().includes(query)
+            );
+            populateMembers(filtered);
+        }
+        
+        function selectMember(member) {
+            document.getElementById('memberSearch').value = member.name;
+            document.getElementById('selectedMemberId').value = member.id;
+            document.getElementById('memberDropdown').style.display = 'none';
+        }
+        
+        // Form submission
+        document.getElementById('assessmentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) {
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.disabled = true;
+            
+            const formData = collectFormData();
+            
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    submitBtn.textContent = 'Submit Assessment';
+                    submitBtn.disabled = false;
+                    
+                    if (result.success) {
+                        showMessage('success', result.message);
+                        setTimeout(() => {
+                            google.script.host.close();
+                        }, 2000);
+                    } else {
+                        showMessage('error', result.message);
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    submitBtn.textContent = 'Submit Assessment';
+                    submitBtn.disabled = false;
+                    showMessage('error', 'Error: ' + error.message);
+                })
+                .submitAbilityAssessment(formData);
+        });
+        
+        function validateForm() {
+            const requiredFields = ['selectedMemberId', 'selectedCategory', 'skill'];
+            let isValid = true;
+            
+            if (!selectedCategory) {
+                showMessage('error', 'Please select an ability category');
+                isValid = false;
+            }
+            
+            requiredFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (!field.value.trim()) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
+                showMessage('error', 'Please fill in all required fields');
+            }
+            
+            return isValid;
+        }
+        
+        function collectFormData() {
+            return {
+                memberId: document.getElementById('selectedMemberId').value,
+                category: selectedCategory,
+                skill: document.getElementById('skill').value.trim(),
+                level: document.getElementById('skillLevel').value,
+                assessor: document.getElementById('assessor').value.trim(),
+                evidence: document.getElementById('evidence').value.trim(),
+                goals: document.getElementById('goals').value.trim()
+            };
+        }
+        
+        function showMessage(type, message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageClass = type === 'success' ? 'success-message' : 'error-message';
+            
+            messageContainer.innerHTML = `<div class="${messageClass}">${message}</div>`;
+            
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>

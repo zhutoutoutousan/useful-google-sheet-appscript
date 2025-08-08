@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Member Profile - Cyberpunk Theme</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            color: #00ff41;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Digital DNA background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(0, 255, 65, 0.1) 0%, transparent 70%),
+                radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.1) 0%, transparent 70%),
+                linear-gradient(45deg, transparent 40%, rgba(0, 255, 65, 0.02) 50%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+            animation: dna-flow 20s linear infinite;
+        }
+        
+        @keyframes dna-flow {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 65, 0.1), rgba(0, 255, 255, 0.1));
+            animation: profile-scan 6s linear infinite;
+        }
+        
+        @keyframes profile-scan {
+            to { transform: rotate(360deg); }
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #00ff41;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.5rem;
+            color: #00ffff;
+        }
+        
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .member-selector {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .selector-label {
+            font-size: 1.1rem;
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .member-select {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00ff41;
+            border-radius: 8px;
+            color: #00ff41;
+            padding: 10px 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            min-width: 200px;
+        }
+        
+        .member-select:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+        }
+        
+        .profile-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .profile-card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #00ff41;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .profile-card:hover::before {
+            left: 100%;
+        }
+        
+        .member-avatar-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .member-avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #00ff41, #00ffff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #000;
+            margin: 0 auto 15px;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+            position: relative;
+        }
+        
+        .member-avatar-large::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #00ff41, #00ffff, #ff0080, #8000ff, #00ff41);
+            z-index: -1;
+            animation: avatar-glow 3s linear infinite;
+        }
+        
+        @keyframes avatar-glow {
+            to { transform: rotate(360deg); }
+        }
+        
+        .member-name-large {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 8px #00ffff;
+            margin-bottom: 10px;
+        }
+        
+        .member-role-large {
+            font-size: 1rem;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        .profile-details {
+            text-align: left;
+        }
+        
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        
+        .detail-title {
+            font-size: 1.1rem;
+            color: #ff0080;
+            font-weight: bold;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 0, 128, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .detail-content {
+            color: #ffffff;
+            line-height: 1.5;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            background: rgba(0, 255, 65, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff41;
+            text-shadow: 0 0 5px #00ff41;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #cccccc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .activity-sections {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .activity-section {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: #00ffff;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, #00ffff, transparent);
+        }
+        
+        .skill-category {
+            margin-bottom: 15px;
+        }
+        
+        .category-name {
+            font-size: 1rem;
+            color: #ff0080;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .skill-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .skill-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .skill-name {
+            min-width: 150px;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+        
+        .skill-progress {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .skill-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skill-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: skill-shimmer 2s infinite;
+        }
+        
+        @keyframes skill-shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .skill-level {
+            min-width: 30px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 255, 65, 0.05);
+            border-left: 3px solid #00ff41;
+            border-radius: 0 5px 5px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            background: rgba(0, 255, 65, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .activity-title {
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .activity-progress {
+            color: #00ff41;
+            font-weight: bold;
+        }
+        
+        .project-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 255, 255, 0.05);
+            border-left: 3px solid #00ffff;
+            border-radius: 0 5px 5px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .project-item:hover {
+            background: rgba(0, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .project-title {
+            font-weight: bold;
+            color: #ffffff;
+        }
+        
+        .project-role {
+            color: #00ffff;
+            font-weight: bold;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            color: #666;
+        }
+        
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, #00ffff, #00ff41);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👤 MEMBER PROFILE</h1>
+            <p>Comprehensive member analysis dashboard</p>
+        </div>
+        
+        <div class="member-selector">
+            <span class="selector-label">🎯 Select Member:</span>
+            <select id="memberSelect" class="member-select">
+                <option value="">Choose a member...</option>
+            </select>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            Analyzing member data...
+        </div>
+        
+        <div id="profileContent" style="display: none;">
+            <div class="profile-content">
+                <div class="profile-card">
+                    <div class="member-avatar-section">
+                        <div class="member-avatar-large" id="memberAvatar">?</div>
+                        <div class="member-name-large" id="memberName">Unknown Member</div>
+                        <div class="member-role-large" id="memberRole">Unknown Role</div>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <div class="detail-section">
+                            <div class="detail-title">📧 Contact Information</div>
+                            <div class="detail-content">
+                                <div>Email: <span id="memberEmail">-</span></div>
+                                <div>Phone: <span id="memberContact">-</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <div class="detail-title">🏛️ Department & Status</div>
+                            <div class="detail-content">
+                                <div>Department: <span id="memberDepartment">-</span></div>
+                                <div>Status: <span id="memberStatus">-</span></div>
+                                <div>Joined: <span id="memberJoinDate">-</span></div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <div class="detail-title">🔬 Research Interests</div>
+                            <div class="detail-content" id="memberResearch">
+                                No research interests specified.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalSkills">0</div>
+                        <div class="stat-label">Skills Assessed</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="avgSkillLevel">0</div>
+                        <div class="stat-label">Avg Skill Level</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="learningActivities">0</div>
+                        <div class="stat-label">Learning Activities</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="projectsInvolved">0</div>
+                        <div class="stat-label">Projects Involved</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="ideasSubmitted">0</div>
+                        <div class="stat-label">Ideas Submitted</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalHours">0</div>
+                        <div class="stat-label">Learning Hours</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="activity-sections">
+                <div class="activity-section">
+                    <div class="section-title">🧠 Skill Assessment Matrix</div>
+                    <div id="skillsMatrix">
+                        <!-- Skills will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="activity-section">
+                    <div class="section-title">📚 Recent Learning Activities</div>
+                    <div class="activity-list" id="recentLearning">
+                        <!-- Learning activities will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="activity-section">
+                    <div class="section-title">🚀 Project Involvement</div>
+                    <div class="activity-list" id="projectInvolvement">
+                        <!-- Projects will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="noSelection" class="no-data">
+            <h3>🤖 Select a member to view their profile</h3>
+            <p>Choose a team member from the dropdown above to see their detailed analysis.</p>
+        </div>
+        
+        <button class="refresh-btn" onclick="refreshProfile()">🔄 Refresh Profile</button>
+    </div>
+    
+    <script>
+        let currentMemberId = null;
+        
+        // Load member profile data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('[MEMBER-PROFILE] 🌟 Page loaded, starting initialization');
+            loadMemberList();
+            setupMemberSelector();
+        });
+        
+        function setupMemberSelector() {
+            document.getElementById('memberSelect').addEventListener('change', function() {
+                const memberId = this.value;
+                if (memberId) {
+                    loadMemberProfile(memberId);
+                } else {
+                    showNoSelection();
+                }
+            });
+        }
+        
+        function loadMemberList() {
+            console.log('[MEMBER-PROFILE] 🚀 Starting loadMemberList()');
+            
+            // Use pre-loaded data instead of async call
+            console.log('[MEMBER-PROFILE] 📊 Using pre-loaded data from template');
+            const allMembersRaw = <?= JSON.stringify(allMembers) ?>;
+            console.log('[MEMBER-PROFILE] 📊 Template data (raw):', allMembersRaw);
+            
+            // Parse the data if it's a string
+            let allMembers;
+            if (typeof allMembersRaw === 'string') {
+                console.log('[MEMBER-PROFILE] 🔧 Parsing JSON string data');
+                allMembers = JSON.parse(allMembersRaw);
+            } else {
+                allMembers = allMembersRaw;
+            }
+            console.log('[MEMBER-PROFILE] 📊 Parsed data:', allMembers);
+            console.log('[MEMBER-PROFILE] 📊 Data type after parsing:', typeof allMembers);
+            
+            // Simulate async behavior for consistency
+            setTimeout(() => {
+                populateMemberList(allMembers);
+            }, 100);
+        }
+        
+        function populateMemberList(members) {
+            console.log('[MEMBER-PROFILE] ✅ Received members from backend:', members);
+            console.log('[MEMBER-PROFILE] 📊 Members type:', typeof members);
+            console.log('[MEMBER-PROFILE] 📊 Members structure:', JSON.stringify(members, null, 2));
+            
+            const select = document.getElementById('memberSelect');
+            if (!select) {
+                console.log('[MEMBER-PROFILE] ❌ memberSelect element not found!');
+                return;
+            }
+            
+            select.innerHTML = '<option value="">Choose a member...</option>';
+            
+            if (!members) {
+                console.log('[MEMBER-PROFILE] ❌ No members data received');
+                return;
+            }
+            
+            if (!Array.isArray(members)) {
+                console.log('[MEMBER-PROFILE] ❌ Members is not an array:', typeof members);
+                return;
+            }
+            
+            console.log('[MEMBER-PROFILE] 👥 Processing', members.length, 'members');
+            
+            if (members.length === 0) {
+                console.log('[MEMBER-PROFILE] ❌ Members array is empty');
+                return;
+            }
+            
+            members.forEach((member, index) => {
+                console.log('[MEMBER-PROFILE] 👤 Adding member', index + 1, ':', member.name, '(' + member.id + ')');
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = `${member.name} (${member.email})`;
+                select.appendChild(option);
+            });
+            
+            console.log('[MEMBER-PROFILE] ✅ Member dropdown populated with', members.length, 'options');
+        }
+        
+        function loadMemberProfile(memberId) {
+            console.log('[MEMBER-PROFILE] 🚀 Starting loadMemberProfile for ID:', memberId);
+            currentMemberId = memberId;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('noSelection').style.display = 'none';
+            
+            // Use pre-loaded profile data instead of async call
+            console.log('[MEMBER-PROFILE] 📊 Using pre-loaded profile data');
+            const memberProfilesRaw = <?= JSON.stringify(memberProfiles) ?>;
+            console.log('[MEMBER-PROFILE] 📊 All profiles (raw):', memberProfilesRaw);
+            
+            // Parse the data if it's a string
+            let memberProfiles;
+            if (typeof memberProfilesRaw === 'string') {
+                console.log('[MEMBER-PROFILE] 🔧 Parsing JSON string profiles');
+                memberProfiles = JSON.parse(memberProfilesRaw);
+            } else {
+                memberProfiles = memberProfilesRaw;
+            }
+            
+            console.log('[MEMBER-PROFILE] 📊 Available profile IDs:', Object.keys(memberProfiles));
+            const profileData = memberProfiles[memberId];
+            console.log('[MEMBER-PROFILE] 📊 Profile data for', memberId, ':', profileData);
+            
+            // Simulate async behavior for consistency
+            setTimeout(() => {
+                if (profileData) {
+                    console.log('[MEMBER-PROFILE] ✅ Found profile data, displaying...');
+                    displayMemberProfile(profileData);
+                } else {
+                    console.log('[MEMBER-PROFILE] ❌ No profile data found for ID:', memberId);
+                    handleError('Profile not found for member: ' + memberId);
+                }
+            }, 100);
+        }
+        
+        function displayMemberProfile(data) {
+            console.log('[MEMBER-PROFILE] ✅ Received profile data from backend:', data);
+            console.log('[MEMBER-PROFILE] 📊 Data type:', typeof data);
+            console.log('[MEMBER-PROFILE] 📊 Data structure:', JSON.stringify(data, null, 2));
+            
+            document.getElementById('loading').style.display = 'none';
+            
+            if (!data) {
+                console.log('[MEMBER-PROFILE] ❌ No profile data received');
+                showNoSelection();
+                return;
+            }
+            
+            if (!data.member) {
+                console.log('[MEMBER-PROFILE] ❌ No member property in profile data');
+                showNoSelection();
+                return;
+            }
+            
+            console.log('[MEMBER-PROFILE] 🎉 Valid profile data received! Processing...');
+            
+            // Update basic profile info
+            document.getElementById('memberAvatar').textContent = data.member.name.charAt(0).toUpperCase();
+            document.getElementById('memberName').textContent = data.member.name;
+            document.getElementById('memberRole').textContent = data.member.role;
+            document.getElementById('memberEmail').textContent = data.member.email || 'Not provided';
+            document.getElementById('memberContact').textContent = data.member.contactInfo || 'Not provided';
+            document.getElementById('memberDepartment').textContent = data.member.department || 'Not specified';
+            document.getElementById('memberStatus').textContent = data.member.status || 'Unknown';
+            document.getElementById('memberJoinDate').textContent = new Date(data.member.joinDate).toLocaleDateString();
+            document.getElementById('memberResearch').textContent = data.member.researchInterests || 'No research interests specified.';
+            
+            // Update stats
+            document.getElementById('totalSkills').textContent = data.stats.totalSkills;
+            document.getElementById('avgSkillLevel').textContent = data.stats.avgSkillLevel.toFixed(1);
+            document.getElementById('learningActivities').textContent = data.stats.learningActivities;
+            document.getElementById('projectsInvolved').textContent = data.stats.projectsInvolved;
+            document.getElementById('ideasSubmitted').textContent = data.stats.ideasSubmitted;
+            document.getElementById('totalHours').textContent = data.stats.totalHours;
+            
+            // Update role styling
+            const roleElement = document.getElementById('memberRole');
+            const roleClass = data.member.role.toLowerCase().replace(/\s+/g, '-');
+            roleElement.className = `member-role-large role-${roleClass}`;
+            
+            // Display skills matrix
+            displaySkillsMatrix(data.skills);
+            
+            // Display recent learning
+            displayRecentLearning(data.learning);
+            
+            // Display project involvement
+            displayProjectInvolvement(data.projects);
+            
+            document.getElementById('profileContent').style.display = 'block';
+        }
+        
+        function displaySkillsMatrix(skills) {
+            const container = document.getElementById('skillsMatrix');
+            container.innerHTML = '';
+            
+            if (Object.keys(skills).length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No skill assessments found.</div>';
+                return;
+            }
+            
+            Object.keys(skills).forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'skill-category';
+                
+                categoryDiv.innerHTML = `
+                    <div class="category-name">${category}</div>
+                    <div class="skill-bars">
+                        ${skills[category].map(skill => `
+                            <div class="skill-bar">
+                                <div class="skill-name">${skill.name}</div>
+                                <div class="skill-progress">
+                                    <div class="skill-fill" style="width: ${skill.level * 10}%; background: ${getSkillColor(skill.level)};"></div>
+                                </div>
+                                <div class="skill-level" style="color: ${getSkillColor(skill.level)};">${skill.level}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                container.appendChild(categoryDiv);
+            });
+        }
+        
+        function displayRecentLearning(learning) {
+            const container = document.getElementById('recentLearning');
+            container.innerHTML = '';
+            
+            if (learning.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No learning activities found.</div>';
+                return;
+            }
+            
+            learning.forEach(activity => {
+                const activityDiv = document.createElement('div');
+                activityDiv.className = 'activity-item';
+                activityDiv.innerHTML = `
+                    <div>
+                        <div class="activity-title">${activity.title}</div>
+                        <div style="font-size: 0.8rem; color: #cccccc;">${activity.type} • ${activity.duration} hours</div>
+                    </div>
+                    <div class="activity-progress">${activity.progress}%</div>
+                `;
+                container.appendChild(activityDiv);
+            });
+        }
+        
+        function displayProjectInvolvement(projects) {
+            const container = document.getElementById('projectInvolvement');
+            container.innerHTML = '';
+            
+            if (projects.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No project involvement found.</div>';
+                return;
+            }
+            
+            projects.forEach(project => {
+                const projectDiv = document.createElement('div');
+                projectDiv.className = 'project-item';
+                projectDiv.innerHTML = `
+                    <div>
+                        <div class="project-title">${project.title}</div>
+                        <div style="font-size: 0.8rem; color: #cccccc;">${project.status} • ${project.progress}% complete</div>
+                    </div>
+                    <div class="project-role">${project.role}</div>
+                `;
+                container.appendChild(projectDiv);
+            });
+        }
+        
+        function getSkillColor(level) {
+            if (level >= 9) return '#8000ff';
+            if (level >= 7) return '#00ffff';
+            if (level >= 5) return '#00ff41';
+            if (level >= 3) return '#ff8000';
+            return '#ff0080';
+        }
+        
+        function showNoSelection() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('profileContent').style.display = 'none';
+            document.getElementById('noSelection').style.display = 'block';
+        }
+        
+        function refreshProfile() {
+            if (currentMemberId) {
+                loadMemberProfile(currentMemberId);
+            } else {
+                loadMemberList();
+            }
+        }
+        
+        function handleError(error) {
+            console.log('[MEMBER-PROFILE] ❌ ERROR in handleError:', error);
+            console.log('[MEMBER-PROFILE] ❌ Error type:', typeof error);
+            console.log('[MEMBER-PROFILE] ❌ Error details:', JSON.stringify(error, null, 2));
+            
+            document.getElementById('loading').style.display = 'none';
+            showNoSelection();
+            console.error('Error loading member profile:', error);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>系统设置</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #3f51b5, #2196f3, #00bcd4, #009688);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #3f51b5, #2196f3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .settings-section {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #3f51b5;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .setting-item {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            transition: border-color 0.3s ease;
+        }
+        
+        .setting-item:hover {
+            border-color: #3f51b5;
+        }
+        
+        .setting-info {
+            flex: 1;
+        }
+        
+        .setting-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .setting-description {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .setting-control {
+            min-width: 150px;
+            text-align: right;
+        }
+        
+        .setting-control input,
+        .setting-control select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .setting-control input:focus,
+        .setting-control select:focus {
+            outline: none;
+            border-color: #3f51b5;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 25px;
+            background: #ccc;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .toggle-switch.active {
+            background: #3f51b5;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 21px;
+            height: 21px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(25px);
+        }
+        
+        .system-info {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .info-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3f51b5;
+            margin-bottom: 5px;
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .danger-zone {
+            background: #ffeaa7;
+            border: 2px solid #fdcb6e;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .danger-title {
+            color: #e17055;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .danger-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3f51b5, #2196f3);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(63, 81, 181, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #5f6368;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e8eaed;
+            border-color: #c0c0c0;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3f51b5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+            color: #137333;
+            font-weight: 500;
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 12px;
+            border-left: 5px solid #34a853;
+        }
+        
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .setting-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .setting-control {
+                width: 100%;
+                text-align: left;
+            }
+            
+            .danger-actions {
+                flex-direction: column;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ 系统设置</h1>
+            <p>配置训练营管理系统参数</p>
+        </div>
+        
+        <!-- 系统信息 -->
+        <div class="system-info">
+            <h3 style="text-align: center; margin-bottom: 20px; color: #333;">📊 系统概览</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-value" id="totalStudents">-</div>
+                    <div class="info-label">学生总数</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value" id="totalTeachers">-</div>
+                    <div class="info-label">教师总数</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value" id="activeTasks">-</div>
+                    <div class="info-label">活跃任务</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value" id="totalPoints">-</div>
+                    <div class="info-label">总积分</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 基本设置 -->
+        <div class="settings-section">
+            <div class="section-title">
+                🏫 基本设置
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">训练营名称</div>
+                    <div class="setting-description">显示在系统顶部的训练营名称</div>
+                </div>
+                <div class="setting-control">
+                    <input type="text" id="bootcampName" value="IT前端训练营V2">
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">课程周期</div>
+                    <div class="setting-description">完整课程的学习周期</div>
+                </div>
+                <div class="setting-control">
+                    <select id="courseDuration">
+                        <option value="3个月">3个月</option>
+                        <option value="6个月" selected>6个月</option>
+                        <option value="9个月">9个月</option>
+                        <option value="12个月">12个月</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">每班最大人数</div>
+                    <div class="setting-description">每个班级的最大学生数量</div>
+                </div>
+                <div class="setting-control">
+                    <input type="number" id="maxStudents" value="30" min="10" max="100">
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">及格分数</div>
+                    <div class="setting-description">考核和任务的最低及格分数</div>
+                </div>
+                <div class="setting-control">
+                    <input type="number" id="passingScore" value="60" min="50" max="80">
+                </div>
+            </div>
+        </div>
+        
+        <!-- 功能设置 -->
+        <div class="settings-section">
+            <div class="section-title">
+                🎯 功能设置
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">积分制度</div>
+                    <div class="setting-description">启用学生积分奖励系统</div>
+                </div>
+                <div class="setting-control">
+                    <div class="toggle-switch active" onclick="切换开关(this)"></div>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">徽章系统</div>
+                    <div class="setting-description">启用学生成就徽章系统</div>
+                </div>
+                <div class="setting-control">
+                    <div class="toggle-switch active" onclick="切换开关(this)"></div>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">自动提醒</div>
+                    <div class="setting-description">自动发送任务截止提醒</div>
+                </div>
+                <div class="setting-control">
+                    <div class="toggle-switch active" onclick="切换开关(this)"></div>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">数据备份</div>
+                    <div class="setting-description">定期自动备份系统数据</div>
+                </div>
+                <div class="setting-control">
+                    <div class="toggle-switch" onclick="切换开关(this)"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 通知设置 -->
+        <div class="settings-section">
+            <div class="section-title">
+                📧 通知设置
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">邮件通知</div>
+                    <div class="setting-description">启用邮件通知功能</div>
+                </div>
+                <div class="setting-control">
+                    <div class="toggle-switch" onclick="切换开关(this)"></div>
+                </div>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-info">
+                    <div class="setting-name">通知频率</div>
+                    <div class="setting-description">系统通知的发送频率</div>
+                </div>
+                <div class="setting-control">
+                    <select id="notificationFrequency">
+                        <option value="实时">实时</option>
+                        <option value="每日" selected>每日</option>
+                        <option value="每周">每周</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 危险操作区 -->
+        <div class="danger-zone">
+            <div class="danger-title">
+                ⚠️ 危险操作区
+            </div>
+            <p style="margin-bottom: 15px; color: #666;">以下操作将影响系统数据，请谨慎操作：</p>
+            <div class="danger-actions">
+                <button class="btn btn-secondary" onclick="清理过期数据()">🗑️ 清理过期数据</button>
+                <button class="btn btn-secondary" onclick="重置统计数据()">📊 重置统计数据</button>
+                <button class="btn btn-danger" onclick="重置所有设置()">🔄 重置所有设置</button>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button type="button" class="btn btn-secondary" onclick="关闭对话框()">
+                ❌ 取消
+            </button>
+            <button type="button" class="btn btn-primary" onclick="保存设置()">
+                ✅ 保存设置
+            </button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            🎉 设置保存成功！
+        </div>
+    </div>
+
+    <script>
+        // 页面加载时获取系统信息
+        document.addEventListener('DOMContentLoaded', function() {
+            加载系统信息();
+            加载当前设置();
+        });
+        
+        function 加载系统信息() {
+            // 这里可以调用后端函数获取真实数据
+            document.getElementById('totalStudents').textContent = '28';
+            document.getElementById('totalTeachers').textContent = '5';
+            document.getElementById('activeTasks').textContent = '42';
+            document.getElementById('totalPoints').textContent = '3,260';
+        }
+        
+        function 加载当前设置() {
+            // 从后端加载当前设置值
+            google.script.run
+                .withSuccessHandler(function(settings) {
+                    if (settings) {
+                        document.getElementById('bootcampName').value = settings.bootcampName || 'IT前端训练营V2';
+                        document.getElementById('courseDuration').value = settings.courseDuration || '6个月';
+                        document.getElementById('maxStudents').value = settings.maxStudents || 30;
+                        document.getElementById('passingScore').value = settings.passingScore || 60;
+                        document.getElementById('notificationFrequency').value = settings.notificationFrequency || '每日';
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    console.error('加载设置失败:', error);
+                })
+                .获取系统设置();
+        }
+        
+        function 切换开关(element) {
+            element.classList.toggle('active');
+        }
+        
+        function 关闭对话框() {
+            google.script.host.close();
+        }
+        
+        function 保存设置() {
+            显示加载状态();
+            
+            // 收集所有设置
+            const 设置数据 = {
+                bootcampName: document.getElementById('bootcampName').value,
+                courseDuration: document.getElementById('courseDuration').value,
+                maxStudents: parseInt(document.getElementById('maxStudents').value),
+                passingScore: parseInt(document.getElementById('passingScore').value),
+                notificationFrequency: document.getElementById('notificationFrequency').value,
+                pointsSystem: document.querySelector('.toggle-switch:nth-of-type(1)').classList.contains('active'),
+                badgeSystem: document.querySelector('.toggle-switch:nth-of-type(2)').classList.contains('active'),
+                autoReminder: document.querySelector('.toggle-switch:nth-of-type(3)').classList.contains('active'),
+                dataBackup: document.querySelector('.toggle-switch:nth-of-type(4)').classList.contains('active'),
+                emailNotification: document.querySelector('.toggle-switch:nth-of-type(5)').classList.contains('active')
+            };
+            
+            // 调用后端保存函数
+            google.script.run
+                .withSuccessHandler(function() {
+                    隐藏加载状态();
+                    显示成功消息();
+                })
+                .withFailureHandler(function(error) {
+                    隐藏加载状态();
+                    alert('保存失败: ' + error.toString());
+                })
+                .保存系统设置(设置数据);
+        }
+        
+        function 清理过期数据() {
+            if (confirm('确定要清理过期数据吗？\n\n这将删除：\n• 已完成的过期任务\n• 旧的日志记录\n• 临时缓存数据')) {
+                显示加载状态();
+                
+                google.script.run
+                    .withSuccessHandler(function(result) {
+                        隐藏加载状态();
+                        alert(`清理完成！\n清理了 ${result.deletedItems} 项过期数据`);
+                    })
+                    .withFailureHandler(function(error) {
+                        隐藏加载状态();
+                        alert('清理失败: ' + error.toString());
+                    })
+                    .清理过期数据();
+            }
+        }
+        
+        function 重置统计数据() {
+            if (confirm('确定要重置统计数据吗？\n\n这将清空：\n• 学习进度统计\n• 积分历史记录\n• 任务完成统计\n\n⚠️ 此操作不可恢复！')) {
+                显示加载状态();
+                
+                google.script.run
+                    .withSuccessHandler(function() {
+                        隐藏加载状态();
+                        alert('统计数据已重置');
+                        加载系统信息();
+                    })
+                    .withFailureHandler(function(error) {
+                        隐藏加载状态();
+                        alert('重置失败: ' + error.toString());
+                    })
+                    .重置统计数据();
+            }
+        }
+        
+        function 重置所有设置() {
+            if (confirm('⚠️ 危险操作确认\n\n确定要重置所有设置到默认值吗？\n\n这将：\n• 恢复默认系统设置\n• 清除自定义配置\n• 重置功能开关\n\n此操作不可恢复！')) {
+                if (confirm('最后确认：真的要重置所有设置吗？')) {
+                    显示加载状态();
+                    
+                    google.script.run
+                        .withSuccessHandler(function() {
+                            隐藏加载状态();
+                            alert('所有设置已重置为默认值');
+                            加载当前设置();
+                        })
+                        .withFailureHandler(function(error) {
+                            隐藏加载状态();
+                            alert('重置失败: ' + error.toString());
+                        })
+                        .重置所有设置();
+                }
+            }
+        }
+        
+        function 显示加载状态() {
+            document.getElementById('loading').style.display = 'block';
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = true);
+        }
+        
+        function 隐藏加载状态() {
+            document.getElementById('loading').style.display = 'none';
+            document.querySelectorAll('.btn').forEach(btn => btn.disabled = false);
+        }
+        
+        function 显示成功消息() {
+            document.getElementById('successMessage').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('successMessage').style.display = 'none';
+            }, 3000);
+        }
+        
+        // 输入验证
+        document.getElementById('maxStudents').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 10) this.value = 10;
+            if (value > 100) this.value = 100;
+        });
+        
+        document.getElementById('passingScore').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 50) this.value = 50;
+            if (value > 80) this.value = 80;
+        });
+    </script>
+</body>
+</html>
