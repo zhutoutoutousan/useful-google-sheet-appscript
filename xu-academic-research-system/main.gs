@@ -63,6 +63,104 @@ const SYSTEM_CONFIG = {
 };
 
 /**
+ * Add sample learning activities for testing
+ */
+function addSampleLearningActivities() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const membersSheet = ss.getSheetByName(SYSTEM_CONFIG.SHEET_NAMES.MEMBERS);
+    
+    // Get the first member for testing
+    let memberId = 'TEST001';
+    if (membersSheet && membersSheet.getLastRow() > 1) {
+      const memberData = membersSheet.getRange(2, 1, 1, 1).getValue();
+      memberId = memberData;
+    }
+    
+    const sampleActivities = [
+      {
+        memberId: memberId,
+        type: 'Online Course',
+        title: 'Machine Learning Fundamentals',
+        description: 'Comprehensive course on ML basics and algorithms',
+        source: 'https://coursera.org/ml-course',
+        duration: 40,
+        progress: 85,
+        rating: 4.5,
+        notes: 'Excellent course, highly recommended for beginners',
+        skillsGained: 'Python, Scikit-learn, Neural Networks'
+      },
+      {
+        memberId: memberId,
+        type: 'YouTube Video',
+        title: 'Deep Learning with TensorFlow',
+        description: 'Tutorial on building neural networks',
+        source: 'https://youtube.com/watch?v=tensorflow-tutorial',
+        duration: 2.5,
+        progress: 100,
+        rating: 4.0,
+        notes: 'Great practical examples',
+        skillsGained: 'TensorFlow, Neural Networks'
+      },
+      {
+        memberId: memberId,
+        type: 'Book',
+        title: 'The Art of Computer Programming',
+        description: 'Classic text on algorithms and data structures',
+        source: 'Donald Knuth',
+        duration: 60,
+        progress: 30,
+        rating: 5.0,
+        notes: 'Challenging but rewarding read',
+        skillsGained: 'Algorithms, Data Structures, Mathematical Thinking'
+      },
+      {
+        memberId: memberId,
+        type: 'Academic Paper',
+        title: 'Attention Is All You Need',
+        description: 'Transformer architecture paper',
+        source: 'arXiv:1706.03762',
+        duration: 8,
+        progress: 100,
+        rating: 4.8,
+        notes: 'Revolutionary paper in NLP',
+        skillsGained: 'Transformer Architecture, Attention Mechanisms'
+      },
+      {
+        memberId: memberId,
+        type: 'Workshop',
+        title: 'Research Methodology Workshop',
+        description: 'Hands-on workshop on research design',
+        source: 'University Research Center',
+        duration: 6,
+        progress: 75,
+        rating: 4.2,
+        notes: 'Very practical and interactive',
+        skillsGained: 'Research Design, Statistical Analysis'
+      }
+    ];
+    
+    let successCount = 0;
+    sampleActivities.forEach(activity => {
+      const result = addLearningActivity(activity);
+      if (result.success) {
+        successCount++;
+        console.log('Added sample activity:', activity.title);
+      } else {
+        console.error('Failed to add activity:', result.message);
+      }
+    });
+    
+    console.log(`Successfully added ${successCount} sample learning activities`);
+    return `Added ${successCount} sample learning activities for testing`;
+    
+  } catch (error) {
+    console.error('Error adding sample activities:', error);
+    return 'Error: ' + error.message;
+  }
+}
+
+/**
  * Initialize the XU Academic Research Management System
  */
 function onOpen() {
@@ -97,6 +195,9 @@ function onOpen() {
       .addItem('Schedule Event', 'showEventDialog')
       .addItem('Event Calendar', 'showEventCalendar')
       .addItem('RSVP Management', 'showRSVPManagement'))
+    .addSeparator()
+    .addSubMenu(ui.createMenu('🧪 Testing')
+      .addItem('Add Sample Learning Activities', 'addSampleLearningActivities'))
     .addSeparator()
     .addSubMenu(ui.createMenu('🌟 Cyberpunk Theme')
       .addItem('🚀 Apply Cyberpunk Theme', 'applyCyberpunkThemeToAllSheets')
@@ -1650,6 +1751,7 @@ function getLearningProgressDataForMember(memberId) {
       return {
         activities: [],
         stats: { total: 0, completed: 0, avgProgress: 0, totalHours: 0 },
+        filters: { members: [], types: [] },
         error: null
       };
     }
@@ -1664,6 +1766,9 @@ function getLearningProgressDataForMember(memberId) {
       learning.reduce((sum, activity) => sum + activity.progress, 0) / totalActivities : 0;
     const totalHours = learning.reduce((sum, activity) => sum + activity.duration, 0);
     
+    // Get filters data
+    const filters = getLearningFilters();
+    
     return {
       activities: learning,
       stats: {
@@ -1672,6 +1777,7 @@ function getLearningProgressDataForMember(memberId) {
         avgProgress: Math.round(avgProgress * 10) / 10,
         totalHours: totalHours
       },
+      filters: filters,
       error: null
     };
     
@@ -1680,9 +1786,43 @@ function getLearningProgressDataForMember(memberId) {
     return {
       activities: [],
       stats: { total: 0, completed: 0, avgProgress: 0, totalHours: 0 },
+      filters: { members: [], types: [] },
       error: error.toString()
     };
   }
+}
+
+/**
+ * Get learning filters for the interface
+ */
+function getLearningFilters() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const learningSheet = ss.getSheetByName(SYSTEM_CONFIG.SHEET_NAMES.LEARNING_ACTIVITIES);
+  const membersSheet = ss.getSheetByName(SYSTEM_CONFIG.SHEET_NAMES.MEMBERS);
+  
+  const uniqueMembers = new Set();
+  const uniqueTypes = new Set();
+  
+  // Get member names
+  if (membersSheet && membersSheet.getLastRow() > 1) {
+    const memberData = membersSheet.getRange(2, 1, membersSheet.getLastRow() - 1, 2).getValues();
+    memberData.forEach(row => {
+      uniqueMembers.add(row[1] || row[0]);
+    });
+  }
+  
+  // Get learning types
+  if (learningSheet && learningSheet.getLastRow() > 1) {
+    const data = learningSheet.getRange(2, 3, learningSheet.getLastRow() - 1, 1).getValues();
+    data.forEach(row => {
+      if (row[0]) uniqueTypes.add(row[0]);
+    });
+  }
+  
+  return {
+    members: Array.from(uniqueMembers).sort(),
+    types: Array.from(uniqueTypes).sort()
+  };
 }
 
 /**
@@ -2358,17 +2498,34 @@ function getMemberLearning(sheet, memberId) {
   const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, sheet.getLastColumn()).getValues();
   const memberActivities = data.filter(row => row[1] === memberId);
   
+  // Get member name for display
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const membersSheet = ss.getSheetByName(SYSTEM_CONFIG.SHEET_NAMES.MEMBERS);
+  let memberName = memberId;
+  if (membersSheet && membersSheet.getLastRow() > 1) {
+    const memberData = membersSheet.getRange(2, 1, membersSheet.getLastRow() - 1, 2).getValues();
+    const memberRow = memberData.find(row => row[0] === memberId);
+    if (memberRow) {
+      memberName = memberRow[1] || memberId;
+    }
+  }
+  
   return memberActivities.map(row => ({
     id: row[0],
+    memberId: memberId,
+    memberName: memberName,
     type: row[2] || 'Unknown',
     title: row[3] || 'Untitled Activity',
     description: row[4] || '',
+    source: row[5] || '',
     duration: parseFloat(row[6]) || 0,
     progress: parseInt(row[7]) || 0,
     startDate: row[8] || new Date(),
     completionDate: row[9] || null,
-    rating: parseFloat(row[10]) || null
-  })).sort((a, b) => new Date(b.startDate) - new Date(a.startDate)).slice(0, 10); // Recent 10
+    rating: parseFloat(row[10]) || null,
+    notes: row[11] || '',
+    skillsGained: row[12] || ''
+  })).sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
 }
 
 /**

@@ -561,6 +561,7 @@
                 // Aggregate all data
                 const allActivities = [];
                 let totalStats = { total: 0, completed: 0, avgProgress: 0, totalHours: 0 };
+                const allFilters = { members: new Set(), types: new Set() };
                 
                 if (window.learningProgressData) {
                     Object.values(window.learningProgressData).forEach(memberData => {
@@ -569,6 +570,12 @@
                             totalStats.total += memberData.stats.total;
                             totalStats.completed += memberData.stats.completed;
                             totalStats.totalHours += memberData.stats.totalHours;
+                            
+                            // Collect filters
+                            if (memberData.filters) {
+                                memberData.filters.members.forEach(m => allFilters.members.add(m));
+                                memberData.filters.types.forEach(t => allFilters.types.add(t));
+                            }
                         }
                     });
                     
@@ -580,6 +587,10 @@
                 data = {
                     activities: allActivities,
                     stats: totalStats,
+                    filters: {
+                        members: Array.from(allFilters.members).sort(),
+                        types: Array.from(allFilters.types).sort()
+                    },
                     error: null
                 };
                 console.log('[LEARNING-PROGRESS] 📊 Aggregated all member data:', data);
