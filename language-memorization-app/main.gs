@@ -293,27 +293,70 @@ function onOpen() {
 }
 
 function addNewWord() {
-  const ui = SpreadsheetApp.getUi();
-  const response = ui.prompt('Add New Word', 'Enter word, definition, and context (separated by commas):', ui.ButtonSet.OK_CANCEL);
+  const htmlTemplate = HtmlService.createTemplateFromFile('add-word-dialog');
+  const html = htmlTemplate.evaluate()
+    .setWidth(600)
+    .setHeight(700)
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   
-  if (response.getSelectedButton() === ui.Button.OK) {
-    const input = response.getResponseText();
-    const parts = input.split(',').map(part => part.trim());
+  SpreadsheetApp.getUi().showModalDialog(html, '⚡ ADD NEW WORD - MEMORY FORGE ⚡');
+}
+
+function processNewWord(formData) {
+  try {
+    const wordsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Words Database');
+    const newRow = wordsSheet.getLastRow() + 1;
     
-    if (parts.length >= 3) {
-      const wordsSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Words Database');
-      const newRow = wordsSheet.getLastRow() + 1;
-      
-      wordsSheet.getRange(newRow, 1).setValue(parts[0]); // Word
-      wordsSheet.getRange(newRow, 2).setValue(parts[1]); // Definition
-      wordsSheet.getRange(newRow, 3).setValue(parts[2]); // Context
-      wordsSheet.getRange(newRow, 4).setValue(3); // Default difficulty
-      wordsSheet.getRange(newRow, 5).setValue(new Date()); // Start today
-      wordsSheet.getRange(newRow, 6).setValue(0); // Initial interval
-      wordsSheet.getRange(newRow, 10).setValue('Active'); // Status
-      wordsSheet.getRange(newRow, 11).setValue(2.5); // Initial ease factor
+    // Validate input
+    if (!formData.word || !formData.definition) {
+      return { success: false, message: 'Word and Definition are required!' };
     }
+    
+    // Calculate difficulty based on word length and complexity
+    const difficulty = calculateWordDifficulty(formData.word, formData.definition);
+    
+    wordsSheet.getRange(newRow, 1).setValue(formData.word);
+    wordsSheet.getRange(newRow, 2).setValue(formData.definition);
+    wordsSheet.getRange(newRow, 3).setValue(formData.context || '');
+    wordsSheet.getRange(newRow, 4).setValue(difficulty);
+    wordsSheet.getRange(newRow, 5).setValue(new Date());
+    wordsSheet.getRange(newRow, 6).setValue(0);
+    wordsSheet.getRange(newRow, 7).setValue(0);
+    wordsSheet.getRange(newRow, 8).setValue(0);
+    wordsSheet.getRange(newRow, 9).setValue(new Date());
+    wordsSheet.getRange(newRow, 10).setValue('Active');
+    wordsSheet.getRange(newRow, 11).setValue(2.5);
+    
+    return { 
+      success: true, 
+      message: `🔥 WORD FORGED: "${formData.word}" has been added to your memory arsenal! 🔥`,
+      difficulty: difficulty
+    };
+  } catch (error) {
+    return { success: false, message: 'Error: ' + error.toString() };
   }
+}
+
+function calculateWordDifficulty(word, definition) {
+  // Calculate difficulty based on word length, definition complexity, and special characters
+  let difficulty = 3; // Base difficulty
+  
+  // Word length factor
+  if (word.length > 12) difficulty += 1;
+  if (word.length > 20) difficulty += 1;
+  
+  // Definition complexity
+  if (definition.length > 100) difficulty += 0.5;
+  if (definition.includes(';') || definition.includes(':')) difficulty += 0.5;
+  
+  // Special characters and complexity
+  const specialChars = (word.match(/[^a-zA-Z0-9\s]/g) || []).length;
+  difficulty += specialChars * 0.3;
+  
+  // Capitalization patterns
+  if (word !== word.toLowerCase() && word !== word.toUpperCase()) difficulty += 0.5;
+  
+  return Math.min(5, Math.max(1, Math.round(difficulty * 10) / 10));
 }
 function customForgettingCurve(interval, difficulty, successRate) {
   // Implement your own algorithm

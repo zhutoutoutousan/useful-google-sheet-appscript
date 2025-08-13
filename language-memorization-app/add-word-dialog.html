@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+      color: #ffffff;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Animated background particles */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(255, 255, 0, 0.05) 0%, transparent 50%);
+      animation: particleFloat 20s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    @keyframes particleFloat {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    .container {
+      max-width: 100%;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+    
+    .title {
+      font-family: 'Orbitron', monospace;
+      font-size: 2.5em;
+      font-weight: 900;
+      background: linear-gradient(45deg, #ff006e, #ff6b35, #f7931e, #ffd23f);
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease-in-out infinite;
+      text-shadow: 0 0 30px rgba(255, 0, 110, 0.5);
+      margin-bottom: 10px;
+    }
+    
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    
+    .subtitle {
+      font-size: 1.2em;
+      color: #00ffff;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 600;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+    
+    .form-container {
+      background: rgba(0, 0, 0, 0.8);
+      border: 3px solid #ff006e;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 
+        0 0 30px rgba(255, 0, 110, 0.3),
+        inset 0 0 30px rgba(0, 0, 0, 0.5);
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+    
+    .form-container::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #ff006e, #00ffff, #ff6b35, #00ffff);
+      border-radius: 17px;
+      z-index: -1;
+      animation: borderGlow 2s linear infinite;
+    }
+    
+    @keyframes borderGlow {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+    
+    .form-label {
+      display: block;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1em;
+      font-weight: 700;
+      color: #00ffff;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #333;
+      border-radius: 8px;
+      color: #ffffff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.1em;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #ff006e;
+      box-shadow: 
+        0 0 20px rgba(255, 0, 110, 0.5),
+        inset 0 0 10px rgba(255, 0, 110, 0.1);
+      transform: scale(1.02);
+    }
+    
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .difficulty-display {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 10px;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 8px;
+      border: 1px solid #333;
+    }
+    
+    .difficulty-bar {
+      flex: 1;
+      height: 20px;
+      background: linear-gradient(90deg, #00ff00, #ffff00, #ff6b35, #ff006e);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .difficulty-fill {
+      height: 100%;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+      position: relative;
+    }
+    
+    .difficulty-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+      animation: shimmer 2s infinite;
+    }
+    
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    
+    .difficulty-text {
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      color: #ff006e;
+      text-shadow: 0 0 10px rgba(255, 0, 110, 0.5);
+      min-width: 80px;
+      text-align: center;
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    
+    .btn {
+      padding: 15px 30px;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.1em;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      min-width: 150px;
+    }
+    
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .btn:hover::before {
+      left: 100%;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(45deg, #ff006e, #ff6b35);
+      color: white;
+      box-shadow: 0 5px 15px rgba(255, 0, 110, 0.4);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(255, 0, 110, 0.6);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(45deg, #333, #666);
+      color: white;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    }
+    
+    .btn-secondary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    }
+    
+    .status-message {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.3s ease;
+    }
+    
+    .status-message.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .status-success {
+      background: rgba(0, 255, 0, 0.2);
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+    
+    .status-error {
+      background: rgba(255, 0, 0, 0.2);
+      border: 2px solid #ff0000;
+      color: #ff0000;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    }
+    
+    /* Loading animation */
+    .loading {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(255, 0, 110, 0.3);
+      border-top: 4px solid #ff006e;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive design */
+    @media (max-width: 600px) {
+      .title {
+        font-size: 2em;
+      }
+      
+      .form-container {
+        padding: 20px;
+      }
+      
+      .button-container {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1 class="title">⚡ MEMORY FORGE ⚡</h1>
+      <p class="subtitle">FORGE NEW WORDS INTO YOUR MIND</p>
+    </div>
+    
+    <div class="form-container">
+      <form id="wordForm">
+        <div class="form-group">
+          <label class="form-label" for="word">🔥 WORD TO FORGE</label>
+          <input type="text" id="word" name="word" class="form-input" placeholder="Enter the word you want to master..." required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="definition">⚡ DEFINITION</label>
+          <textarea id="definition" name="definition" class="form-input form-textarea" placeholder="Define the word's meaning and power..." required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="context">🎯 CONTEXT (OPTIONAL)</label>
+          <textarea id="context" name="context" class="form-input form-textarea" placeholder="Add context, example sentences, or memory hooks..."></textarea>
+        </div>
+        
+        <div class="difficulty-display" id="difficultyDisplay" style="display: none;">
+          <span class="difficulty-text" id="difficultyText">DIFFICULTY: 3.0</span>
+          <div class="difficulty-bar">
+            <div class="difficulty-fill" id="difficultyFill" style="width: 60%;"></div>
+          </div>
+        </div>
+        
+        <div class="button-container">
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            🔥 FORGE WORD
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="google.script.host.close()">
+            ❌ CANCEL
+          </button>
+        </div>
+      </form>
+      
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>FORGING YOUR WORD INTO MEMORY...</p>
+      </div>
+      
+      <div class="status-message" id="statusMessage"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentDifficulty = 3.0;
+    
+    // Real-time difficulty calculation
+    function calculateDifficulty() {
+      const word = document.getElementById('word').value;
+      const definition = document.getElementById('definition').value;
+      
+      if (!word || !definition) {
+        document.getElementById('difficultyDisplay').style.display = 'none';
+        return;
+      }
+      
+      let difficulty = 3.0;
+      
+      // Word length factor
+      if (word.length > 12) difficulty += 1;
+      if (word.length > 20) difficulty += 1;
+      
+      // Definition complexity
+      if (definition.length > 100) difficulty += 0.5;
+      if (definition.includes(';') || definition.includes(':')) difficulty += 0.5;
+      
+      // Special characters
+      const specialChars = (word.match(/[^a-zA-Z0-9\s]/g) || []).length;
+      difficulty += specialChars * 0.3;
+      
+      // Capitalization patterns
+      if (word !== word.toLowerCase() && word !== word.toUpperCase()) difficulty += 0.5;
+      
+      difficulty = Math.min(5, Math.max(1, Math.round(difficulty * 10) / 10));
+      currentDifficulty = difficulty;
+      
+      // Update display
+      const percentage = ((difficulty - 1) / 4) * 100;
+      document.getElementById('difficultyFill').style.width = percentage + '%';
+      document.getElementById('difficultyText').textContent = `DIFFICULTY: ${difficulty}`;
+      document.getElementById('difficultyDisplay').style.display = 'flex';
+    }
+    
+    // Add event listeners for real-time difficulty calculation
+    document.getElementById('word').addEventListener('input', calculateDifficulty);
+    document.getElementById('definition').addEventListener('input', calculateDifficulty);
+    
+    // Form submission
+    document.getElementById('wordForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = {
+        word: document.getElementById('word').value.trim(),
+        definition: document.getElementById('definition').value.trim(),
+        context: document.getElementById('context').value.trim()
+      };
+      
+      // Validation
+      if (!formData.word || !formData.definition) {
+        showStatus('Please fill in both Word and Definition fields!', 'error');
+        return;
+      }
+      
+      // Show loading
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('submitBtn').disabled = true;
+      hideStatus();
+      
+      // Submit to server
+      google.script.run
+        .withSuccessHandler(function(response) {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('submitBtn').disabled = false;
+          
+          if (response.success) {
+            showStatus(response.message, 'success');
+            // Clear form after successful submission
+            setTimeout(() => {
+              document.getElementById('wordForm').reset();
+              document.getElementById('difficultyDisplay').style.display = 'none';
+              hideStatus();
+            }, 3000);
+          } else {
+            showStatus(response.message, 'error');
+          }
+        })
+        .withFailureHandler(function(error) {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('submitBtn').disabled = false;
+          showStatus('Error: ' + error.message, 'error');
+        })
+        .processNewWord(formData);
+    });
+    
+    function showStatus(message, type) {
+      const statusEl = document.getElementById('statusMessage');
+      statusEl.textContent = message;
+      statusEl.className = `status-message status-${type} show`;
+    }
+    
+    function hideStatus() {
+      const statusEl = document.getElementById('statusMessage');
+      statusEl.className = 'status-message';
+    }
+    
+    // Add some interactive effects
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add typing sound effect (visual only)
+      const inputs = document.querySelectorAll('.form-input');
+      inputs.forEach(input => {
+        input.addEventListener('keydown', function() {
+          this.style.transform = 'scale(1.01)';
+          setTimeout(() => {
+            this.style.transform = 'scale(1)';
+          }, 100);
+        });
+      });
+      
+      // Add hover effects to buttons
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-2px) scale(1.05)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+    });
+  </script>
+</body>
+</html>
